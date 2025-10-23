@@ -251,7 +251,7 @@ const Navbar = () => {
                   </li>
                 )}
                 <li>
-                  <Button onClick={handleSignOut} variant="outline" className="w-full px-4 h-10 text-[#ccd6f6] hover:text-[#64ffda] hover:bg-[#172a45] rounded-lg transition-colors">
+                  <Button onClick={handleSignOut} variant="outline" className="w-full px-4 h-10 text-[#64ffda] rounded-lg transition-colors">
                     Sign out
                   </Button>
                 </li>

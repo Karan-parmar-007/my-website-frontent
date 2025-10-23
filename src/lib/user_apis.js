@@ -1,108 +1,144 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
-const FETCH_API_BASE_URL = 'http://localhost:8000/api/v1';
-
-// Create axios instance - withCredentials is crucial for cookies
+// Normalize base URL and ensure /api/v1 prefix
+const API_V1_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+// Axios instance with cookies
 const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true, // This sends cookies with every request
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: API_V1_BASE_URL,
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Fetch-based login
-export const loginUser = async (credentials) => {
-  const response = await fetch(`${FETCH_API_BASE_URL}/user/login`, {
+// Login with JSON body
+export const loginUser = async ({ email, password }) => {
+  const response = await fetch(`${API_V1_BASE_URL}/v1/user/login`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include', // Include cookies
-    body: JSON.stringify(credentials),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Login failed');
+    let errorDetail = 'Login failed';
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
+  }
+
+  try {
+    return await response.json();
+  } catch {
+    return {};
+  }
+};
+
+// Register with JSON body
+export const registerUser = async ({ name, email, password }) => {
+  const payload = {
+    // Adjust field names to your API schema if different
+    preferred_name: name,
+    email,
+    password,
+  };
+
+  const response = await fetch(`${API_V1_BASE_URL}/v1/user/register`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    let errorDetail = 'Registration failed';
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
+  }
+
+  try {
+    return await response.json();
+  } catch {
+    return {};
+  }
+};
+
+// Current user (assumes /api/v1/user/me exists)
+export const getCurrentUser = async () => {
+  const response = await fetch(`${API_V1_BASE_URL}/v1/user/me`, {
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    let errorDetail = 'Unauthorized';
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
   }
 
   return response.json();
 };
 
-// Fetch-based register
-export const registerUser = async (userData) => {
-  const response = await fetch(`${FETCH_API_BASE_URL}/user/register`, {
+// Logout
+export const logoutUser = async () => {
+  const response = await fetch(`${API_V1_BASE_URL}/v1/user/logout`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include', // Include cookies
-    body: JSON.stringify(userData),
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || 'Registration failed');
+    throw new Error('Logout failed');
   }
-
-  return response.json();
+  return true;
 };
 
+// Optional axios versions (JSON body)
 export const userApi = {
-  // Register new user (axios)
   register: async (userData) => {
     try {
-      const response = await apiClient.post('/v1/user/register', {
+      const res = await apiClient.post('/v1/user/register', {
         preferred_name: userData.name,
         email: userData.email,
         password: userData.password,
       });
-      console.log('Register response:', response.data);
-      return response.data;
+      return res.data;
     } catch (error) {
-      console.error('Register error:', error);
       throw error.response?.data || { message: 'Registration failed' };
     }
   },
 
-  // Login user (axios)
   login: async (credentials) => {
     try {
-      const response = await apiClient.post('/v1/user/login', {
+      const res = await apiClient.post('/v1/user/login', {
         email: credentials.email,
         password: credentials.password,
       });
-      console.log('Login response:', response.data);
-      return response.data;
+      return res.data;
     } catch (error) {
-      console.error('Login error:', error);
       throw error.response?.data || { message: 'Login failed' };
     }
   },
 
-  // Logout user
   logout: async () => {
     try {
-      const response = await apiClient.post('/v1/user/logout');
-      console.log('Logged out successfully');
-      return response.data;
+      const res = await apiClient.post('/v1/user/logout');
+      return res.data;
     } catch (error) {
-      console.log('Logout error (clearing session anyway):', error);
       throw error.response?.data || { message: 'Logout failed' };
     }
   },
 
-  // Verify current session - cookie is sent automatically
   verifySession: async () => {
     try {
-      console.log('Verifying session with cookie...');
-      const response = await apiClient.get('/v1/user/me');
-      console.log('Session verification response:', response.data);
-      return response.data;
-    } catch (error) {
-      console.log('Session verification failed:', error.response?.status, error.response?.data);
+      const res = await apiClient.get('/v1/user/me');
+      return res.data;
+    } catch {
       return null;
     }
   },

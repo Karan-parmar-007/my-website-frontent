@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { loginUser, registerUser } from '../lib/user_apis';
+import { loginUser, registerUser, getCurrentUser, logoutUser } from '../lib/user_apis';
 
 const AuthContext = createContext();
 
@@ -14,19 +14,9 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      // Call a backend endpoint to verify the cookie
-      const response = await fetch('http://localhost:8000/api/v1/user/me', {
-        credentials: 'include' // Important: send cookies
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data);
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
+      const data = await getCurrentUser();
+      setUser(data);
+    } catch {
       setUser(null);
     } finally {
       setLoading(false);
@@ -35,33 +25,44 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const data = await loginUser(credentials);
-      setUser(data.user);
+      await loginUser(credentials);
+      // After login, fetch current user from /me (cookie-based)
+      const me = await getCurrentUser();
+      setUser(me);
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, message: error.message };
     }
   };
 
   const register = async (userData) => {
     try {
-      const data = await registerUser(userData);
-      setUser(data.user);
-      return { success: true };
+      await registerUser(userData);
+
+      // Some backends set cookie on register, some don't.
+      // Try to get /me; if it works, we have a token.
+      let hasToken = false;
+      try {
+        const me = await getCurrentUser();
+        setUser(me);
+        hasToken = true;
+      } catch {
+        setUser(null);
+      }
+
+      return { success: true, hasToken };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, message: error.message };
     }
   };
 
   const logout = async () => {
     try {
-      await fetch('http://localhost:8000/api/v1/user/logout', {
-        method: 'POST',
-        credentials: 'include'
-      });
-      setUser(null);
+      await logoutUser();
     } catch (error) {
       console.error('Logout failed:', error);
+    } finally {
+      setUser(null);
     }
   };
 
