@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Loader from '@/components/ui/loader';
+import Loader from '@/components/loader';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { PublicOnlyRoute } from '@/components/ProtectedRoute';
 import Home from '@/pages/home';
 import Login from '@/pages/login';
 import Signup from '@/pages/signup';
+import AdminDashboard from '@/pages/admin/dashboard';
 
 function App() {
   const [showContent, setShowContent] = useState(false);
@@ -39,8 +40,13 @@ function App() {
                 </PublicOnlyRoute>
               } 
             />
+
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
             {/* Add other routes here */}
           </Routes>
+          
+
         </motion.div>
       </Router>
     </AuthProvider>

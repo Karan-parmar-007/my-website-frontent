@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import Navbar from '@/components/ui/navbar';
-import SocialLinks from '@/components/ui/social-links';
-import EmailLink from '@/components/ui/email-link';
-import WorkExperience from '@/components/ui/work-experience';
-import EducationCard from '@/components/ui/education-card';
-import Footer from '@/components/ui/footer';
-import Loader from '@/components/ui/loader';
+import Navbar from '@/components/navbar';
+import SocialLinks from '@/components/social-links';
+import EmailLink from '@/components/email-link';
+import WorkExperience from '@/components/work-experience';
+import EducationCard from '@/components/education-card';
+import Footer from '@/components/footer';
+import Loader from '@/components/loader';
 import { Button } from '@/components/ui/button';
 import { portfolioApi } from '@/lib/portfolio_apis';
 import { useAuth } from '@/contexts/AuthContext';

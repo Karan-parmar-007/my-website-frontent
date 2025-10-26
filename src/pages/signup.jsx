@@ -3,12 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { PasswordInput } from '@/components/ui/password-input';
-import { PasswordCharacter } from '@/components/ui/password-character';
-import SocialLinks from '@/components/ui/social-links';
-import EmailLink from '@/components/ui/email-link';
-import Loader from '@/components/ui/loader';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/card';
+import { PasswordInput } from '@/components/password-input';
+import { PasswordCharacter } from '@/components/password-character';
+import SocialLinks from '@/components/social-links';
+import EmailLink from '@/components/email-link';
+import Loader from '@/components/loader';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Signup = () => {
