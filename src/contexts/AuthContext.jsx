@@ -26,9 +26,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       await loginUser(credentials);
-      // After login, fetch current user from /me (cookie-based)
-      const me = await getCurrentUser();
-      setUser(me);
       return { success: true };
     } catch (error) {
       return { success: false, message: error.message };
@@ -38,19 +35,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       await registerUser(userData);
-
-      // Some backends set cookie on register, some don't.
-      // Try to get /me; if it works, we have a token.
-      let hasToken = false;
-      try {
-        const me = await getCurrentUser();
-        setUser(me);
-        hasToken = true;
-      } catch {
-        setUser(null);
-      }
-
-      return { success: true, hasToken };
+      return { success: true };
     } catch (error) {
       return { success: false, message: error.message };
     }
@@ -67,7 +52,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );

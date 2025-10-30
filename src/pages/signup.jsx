@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +13,8 @@ import { useAuth } from '@/contexts/AuthContext';
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const location = useLocation();
+  const { register, checkAuth } = useAuth();
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -29,7 +30,7 @@ const Signup = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -45,15 +46,9 @@ const Signup = () => {
     setIsSubmitting(true);
     try {
       const result = await register({ name, email, password });
-      
       if (result.success) {
-        if (result.hasToken) {
-          // Token received, redirect to home
-          navigate('/');
-        } else {
-          // No token, redirect to login
-          navigate('/login', { state: { message: 'Registration successful! Please login.' } });
-        }
+        navigate('/', { replace: true });
+        checkAuth(); // Update user state after navigation
       } else {
         setError(result.message || 'Registration failed');
       }

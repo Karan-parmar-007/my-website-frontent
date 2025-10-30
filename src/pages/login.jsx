@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, checkAuth } = useAuth();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,20 +40,14 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      console.log("Attempting login with:", { email });
       const result = await login({ email, password });
-      console.log("Login result received:", result);
-      
       if (result.success) {
-        console.log("Login successful, navigating to home");
-        // Redirect to home page
-        navigate('/');
+        navigate('/', { replace: true });
+        checkAuth(); // Update user state after navigation
       } else {
-        console.log("Login failed:", result.message);
         setError(result.message || 'Invalid email or password');
       }
     } catch (err) {
-      console.error("Unexpected error during login:", err);
       setError('An unexpected error occurred');
     } finally {
       setIsSubmitting(false);

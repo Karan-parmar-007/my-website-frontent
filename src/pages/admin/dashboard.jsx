@@ -47,9 +47,9 @@ function AppSidebar() {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    await logout(); // Wait for logout to complete (clears cookie and sets user to null)
+    navigate('/login'); // Then navigate
   };
 
   return (

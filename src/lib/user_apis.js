@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 // Normalize base URL and ensure /api/v1 prefix
-const API_V1_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_PREFIX = '/v1';
+const API_V1_BASE_URL = `${API_BASE}${API_PREFIX}`;
+
 // Axios instance with cookies
 const apiClient = axios.create({
   baseURL: API_V1_BASE_URL,
@@ -11,7 +14,7 @@ const apiClient = axios.create({
 
 // Login with JSON body
 export const loginUser = async ({ email, password }) => {
-  const response = await fetch(`${API_V1_BASE_URL}/v1/user/login`, {
+  const response = await fetch(`${API_V1_BASE_URL}/user/login`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -43,7 +46,7 @@ export const registerUser = async ({ name, email, password }) => {
     password,
   };
 
-  const response = await fetch(`${API_V1_BASE_URL}/v1/user/register`, {
+  const response = await fetch(`${API_V1_BASE_URL}/user/register`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -66,9 +69,9 @@ export const registerUser = async ({ name, email, password }) => {
   }
 };
 
-// Current user (assumes /api/v1/user/me exists)
+// Current user (assumes /user/me exists)
 export const getCurrentUser = async () => {
-  const response = await fetch(`${API_V1_BASE_URL}/v1/user/me`, {
+  const response = await fetch(`${API_V1_BASE_URL}/user/me`, {
     credentials: 'include',
   });
 
@@ -86,7 +89,7 @@ export const getCurrentUser = async () => {
 
 // Logout
 export const logoutUser = async () => {
-  const response = await fetch(`${API_V1_BASE_URL}/v1/user/logout`, {
+  const response = await fetch(`${API_V1_BASE_URL}/user/logout`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -102,7 +105,7 @@ export const logoutUser = async () => {
 export const userApi = {
   register: async (userData) => {
     try {
-      const res = await apiClient.post('/v1/user/register', {
+      const res = await apiClient.post('/user/register', {
         preferred_name: userData.name,
         email: userData.email,
         password: userData.password,
@@ -115,7 +118,7 @@ export const userApi = {
 
   login: async (credentials) => {
     try {
-      const res = await apiClient.post('/v1/user/login', {
+      const res = await apiClient.post('/user/login', {
         email: credentials.email,
         password: credentials.password,
       });
@@ -127,7 +130,7 @@ export const userApi = {
 
   logout: async () => {
     try {
-      const res = await apiClient.post('/v1/user/logout');
+      const res = await apiClient.post('/user/logout');
       return res.data;
     } catch (error) {
       throw error.response?.data || { message: 'Logout failed' };
@@ -136,10 +139,26 @@ export const userApi = {
 
   verifySession: async () => {
     try {
-      const res = await apiClient.get('/v1/user/me');
+      const res = await apiClient.get('/user/me');
       return res.data;
     } catch {
       return null;
     }
   },
+};
+
+// Add this function to validate user roles
+export const validateUserRole = async (requiredRoles) => {
+  const response = await fetch(`${API_V1_BASE_URL}/user/role-validator`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ required_roles: requiredRoles }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Role validation failed');
+  }
+
+  return response.json();
 };

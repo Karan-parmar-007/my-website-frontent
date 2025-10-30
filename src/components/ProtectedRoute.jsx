@@ -1,9 +1,10 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Prevents authenticated users from accessing login/signup
 export const PublicOnlyRoute = ({ children }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -13,17 +14,26 @@ export const PublicOnlyRoute = ({ children }) => {
     );
   }
 
-  // If user is already logged in, redirect to home
+  // If user is already logged in and tries to access login/signup, show the already-logged-in page
   if (user) {
+    // Check if they're trying to access login or signup specifically
+    const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+
+    if (isAuthPage) {
+      return <Navigate to="/already-logged-in" replace />;
+    }
+
+    // Otherwise redirect to home
     return <Navigate to="/" replace />;
   }
 
   return children;
 };
 
-// For future use - protects routes that require authentication
+// Protects routes that require authentication
 export const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -34,7 +44,8 @@ export const PrivateRoute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    // Save the location they were trying to access
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   return children;
