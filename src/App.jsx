@@ -14,6 +14,8 @@ import Portfolio from '@/pages/admin/portfolio';
 import NotFound from '@/pages/NotFound';
 import AccessDenied from '@/pages/AccessDenied';
 import AlreadyLoggedIn from '@/pages/AlreadyLoggedIn';
+import RolesAndPermissions from './pages/admin/RolesAndPermissions';
+import UsersPage from '@/pages/admin/users';
 
 function App() {
   const [showContent, setShowContent] = useState(false);
@@ -79,6 +81,28 @@ function App() {
                   <PrivateRoute>
                     <RoleProtectedRoute requiredRoles={['super_admin']}>
                       <Portfolio />
+                    </RoleProtectedRoute>
+                  </PrivateRoute>
+                } 
+              />
+
+              <Route 
+                path="/admin/roles" 
+                element={
+                  <PrivateRoute>
+                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                      <RolesAndPermissions />
+                    </RoleProtectedRoute>
+                  </PrivateRoute>
+                } 
+              />
+
+              <Route 
+                path="/admin/users" 
+                element={
+                  <PrivateRoute>
+                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                      <UsersPage />
                     </RoleProtectedRoute>
                   </PrivateRoute>
                 } 
