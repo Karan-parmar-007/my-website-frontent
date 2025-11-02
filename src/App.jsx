@@ -7,10 +7,14 @@ import { RoleProvider } from '@/contexts/RoleContext';
 import { PublicOnlyRoute, PrivateRoute } from '@/components/ProtectedRoute';
 import { RoleProtectedRoute } from '@/components/RoleProtectedRoute';
 import Home from '@/pages/home';
+import ProjectsPage from '@/pages/project';
 import Login from '@/pages/login';
 import Signup from '@/pages/signup';
 import AdminDashboard from '@/pages/admin/dashboard';
 import Portfolio from '@/pages/admin/portfolio';
+import AdminProjectsPage from '@/pages/admin/projects';
+import ProjectAccessLevelPage from '@/pages/admin/project_access_level';
+import ProjectMembershipPage from '@/pages/admin/project_membership';
 import NotFound from '@/pages/NotFound';
 import AccessDenied from '@/pages/AccessDenied';
 import AlreadyLoggedIn from '@/pages/AlreadyLoggedIn';
@@ -33,6 +37,7 @@ function App() {
           >
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/projects" element={<ProjectsPage />} />
               <Route 
                 path="/login" 
                 element={
@@ -85,7 +90,36 @@ function App() {
                   </PrivateRoute>
                 } 
               />
-
+              <Route 
+                path="/admin/projects" 
+                element={
+                  <PrivateRoute>
+                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                      <AdminProjectsPage />
+                    </RoleProtectedRoute>
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/admin/project-access-levels" 
+                element={
+                  <PrivateRoute>
+                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                      <ProjectAccessLevelPage />
+                    </RoleProtectedRoute>
+                  </PrivateRoute>
+                } 
+              />
+              <Route 
+                path="/admin/project-membership" 
+                element={
+                  <PrivateRoute>
+                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                      <ProjectMembershipPage />
+                    </RoleProtectedRoute>
+                  </PrivateRoute>
+                } 
+              />
               <Route 
                 path="/admin/roles" 
                 element={
@@ -96,7 +130,6 @@ function App() {
                   </PrivateRoute>
                 } 
               />
-
               <Route 
                 path="/admin/users" 
                 element={

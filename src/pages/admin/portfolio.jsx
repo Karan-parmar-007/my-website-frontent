@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, FolderKanban, Users, Briefcase, LogOut, Plus, Edit, Trash2, Upload, X, Shield } from 'lucide-react';
+import { Home, FolderKanban, Users, Briefcase, LogOut, Plus, Edit,UsersIcon, Trash2, Upload, X, Shield } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -38,6 +38,9 @@ const menuItems = [
   { title: 'Users', url: '/admin/users', icon: Users },
   { title: 'Portfolio', url: '/admin/portfolio', icon: Briefcase },
   { title: 'Roles & Permissions', url: '/admin/roles', icon: Shield },
+  { title: 'Access Levels', url: '/admin/project-access-levels', icon: Shield },
+  { title: 'Project Membership', url: '/admin/project-membership', icon: UsersIcon },
+
 ];
 
 function AppSidebar() {

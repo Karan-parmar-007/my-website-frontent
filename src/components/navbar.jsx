@@ -3,21 +3,40 @@ import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useProfileData } from '@/hooks/usePortfolioData';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { profileData } = useProfileData();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
-  const navItems = [
-    { number: '01', text: 'About', href: '#about' },
-    { number: '02', text: 'Experience', href: '#experience' },
-    { number: '03', text: 'Work', href: '#work' },
-    { number: '04', text: 'Contact', href: '#contact' },
-  ];
+  // Check if we're on the home page
+  const isHomePage = location.pathname === '/';
+
+  const navItems = isHomePage
+    ? [
+        { number: '01', text: 'About', href: '#about' },
+        { number: '02', text: 'Experience', href: '#experience' },
+        { number: '03', text: 'Work', href: '#work' },
+        { number: '04', text: 'Contact', href: '#contact' },
+        { number: '05', text: 'Projects', href: '/projects' },
+      ]
+    : [
+        { text: 'Home', href: '/' },
+        { number: '01', text: 'Projects', href: '/projects' },
+      ];
+
+  // Helper function to determine if a link is active
+  const isActive = (href) => {
+    if (href.startsWith('#')) {
+      return location.hash === href;
+    } else {
+      return location.pathname === href;
+    }
+  };
 
   const handleDownloadResume = () => {
     if (profileData?.resume_file_base64) {
@@ -45,6 +64,20 @@ const Navbar = () => {
     setIsUserMenuOpen(false);
     setIsMenuOpen(false);
     navigate('/signup');
+  };
+
+  const handleNavClick = (href) => {
+    setIsMenuOpen(false);
+    if (href.startsWith('#')) {
+      // Anchor link
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      // Regular link
+      navigate(href);
+    }
   };
 
   // Close menus when clicking outside
@@ -111,15 +144,29 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             <ul className="flex gap-8">
-              {navItems.map((item) => (
-                <li key={item.number}>
-                  <a
-                    href={item.href}
-                    className="text-[#ccd6f6] hover:text-[#64ffda] transition-colors flex items-center gap-2 text-sm"
-                  >
-                    <span className="text-[#64ffda]">{item.number}.</span>
-                    <span>{item.text}</span>
-                  </a>
+              {navItems.map((item, index) => (
+                <li key={index}>
+                  {item.href.startsWith('#') ? (
+                    <a
+                      href={item.href}
+                      className={`transition-colors flex items-center gap-2 text-sm ${
+                        isActive(item.href) ? 'text-[#64ffda]' : 'text-[#ccd6f6] hover:text-[#64ffda]'
+                      }`}
+                    >
+                      {item.number && <span className="text-[#64ffda]">{item.number}.</span>}
+                      <span>{item.text}</span>
+                    </a>
+                  ) : (
+                    <button
+                      onClick={() => handleNavClick(item.href)}
+                      className={`transition-colors flex items-center gap-2 text-sm ${
+                        isActive(item.href) ? 'text-[#64ffda]' : 'text-[#ccd6f6] hover:text-[#64ffda]'
+                      }`}
+                    >
+                      {item.number && <span className="text-[#64ffda]">{item.number}.</span>}
+                      <span>{item.text}</span>
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
@@ -130,10 +177,9 @@ const Navbar = () => {
                 <button
                   id="user-menu-button"
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="text-[#8892b0]" /* no hover effect */
+                  className="text-[#8892b0]"
                   aria-label="User menu"
                 >
-                  {/* slightly larger classic user icon */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="28"
@@ -150,7 +196,7 @@ const Navbar = () => {
                   </svg>
                 </button>
 
-                {/* Larger Dropdown Menu, no hover color changes */}
+                {/* Dropdown Menu */}
                 {isUserMenuOpen && (
                   <div
                     id="user-menu-dropdown"
@@ -208,16 +254,29 @@ const Navbar = () => {
         {/* Mobile Menu Dropdown */}
         <div id="navbar-menu" className={`${isMenuOpen ? 'block' : 'hidden'} md:hidden w-full pb-4`}>
           <ul className="flex flex-col gap-2 mt-4">
-            {navItems.map((item) => (
-              <li key={item.number}>
-                <a
-                  href={item.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block py-3 px-4 text-[#ccd6f6] hover:text-[#64ffda] hover:bg-[#172a45] rounded-lg transition-colors"
-                >
-                  <span className="text-[#64ffda] mr-2 text-sm">{item.number}.</span>
-                  <span className="text-base">{item.text}</span>
-                </a>
+            {navItems.map((item, index) => (
+              <li key={index}>
+                {item.href.startsWith('#') ? (
+                  <a
+                    href={item.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`block py-3 px-4 hover:bg-[#172a45] rounded-lg transition-colors ${
+                      isActive(item.href) ? 'text-[#64ffda]' : 'text-[#ccd6f6] hover:text-[#64ffda]'
+                    }`}
+                  >
+                    {item.number && <span className="text-[#64ffda] mr-2 text-sm">{item.number}.</span>}
+                    <span className="text-base">{item.text}</span>
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => handleNavClick(item.href)}
+                    className={`w-full text-left block py-3 px-4 hover:bg-[#172a45] rounded-lg transition-colors ${
+                      isActive(item.href) ? 'text-[#64ffda]' : 'text-[#ccd6f6] hover:text-[#64ffda]'
+                    }`}
+                  >
+                    <span className="text-base">{item.text}</span>
+                  </button>
+                )}
               </li>
             ))}
 
