@@ -42,6 +42,16 @@ jobs:
           ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest
           ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:${{ github.sha }}
 
+    - name: Copy nginx config to server
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        source: "nginx.conf"
+        target: "/opt/my_portfolio"
+
     - name: Deploy to server
       uses: appleboy/ssh-action@v1.0.3
       with:
@@ -61,8 +71,8 @@ jobs:
           echo "⏳ Waiting for frontend to be ready..."
           sleep 15
          
-          echo "🔄 Restarting nginx to refresh connections..."
-          docker compose restart nginx
+          echo "🔄 Reloading nginx with new config..."
+          docker compose exec nginx nginx -s reload
          
           echo "🧹 Cleaning up old images..."
           docker image prune -f
