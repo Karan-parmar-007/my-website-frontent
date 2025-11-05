@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { loginUser, registerUser, getCurrentUser, logoutUser } from '../lib/user_apis';
 
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
