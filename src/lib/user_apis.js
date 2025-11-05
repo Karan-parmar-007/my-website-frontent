@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Normalize base URL and ensure /api/v1 prefix
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_BASE = import.meta.env.VITE_API_URL;
 const API_PREFIX = '/v1';
 const API_V1_BASE_URL = `${API_BASE}${API_PREFIX}`;
 
