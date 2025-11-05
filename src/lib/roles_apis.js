@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 // Get all roles
-export const getRoles = async () => {
+const getRoles = async () => {
   try {
     const response = await api.get('/v1/user/roles');
     return response.data;
@@ -19,7 +19,7 @@ export const getRoles = async () => {
 };
 
 // Get role by ID
-export const getRole = async (roleId) => {
+const getRole = async (roleId) => {
   try {
     const response = await api.get(`/v1/user/roles/${roleId}`);
     return response.data;
@@ -30,7 +30,7 @@ export const getRole = async (roleId) => {
 };
 
 // Create role
-export const createRole = async (data) => {
+const createRole = async (data) => {
   try {
     const response = await api.post('/v1/user/roles', data);
     return response.data;
@@ -41,7 +41,7 @@ export const createRole = async (data) => {
 };
 
 // Update role
-export const updateRole = async (roleId, data) => {
+const updateRole = async (roleId, data) => {
   try {
     const response = await api.put(`/v1/user/roles/${roleId}`, data);
     return response.data;
@@ -52,7 +52,7 @@ export const updateRole = async (roleId, data) => {
 };
 
 // Delete role
-export const deleteRole = async (roleId) => {
+const deleteRole = async (roleId) => {
   try {
     await api.delete(`/v1/user/roles/${roleId}`);
   } catch (error) {
@@ -62,7 +62,7 @@ export const deleteRole = async (roleId) => {
 };
 
 // Get all permissions
-export const getPermissions = async () => {
+const getPermissions = async () => {
   try {
     const response = await api.get('/v1/user/permissions');
     return response.data;
@@ -73,7 +73,7 @@ export const getPermissions = async () => {
 };
 
 // Get permission by ID
-export const getPermission = async (permissionId) => {
+const getPermission = async (permissionId) => {
   try {
     const response = await api.get(`/v1/user/permissions/${permissionId}`);
     return response.data;
@@ -84,7 +84,7 @@ export const getPermission = async (permissionId) => {
 };
 
 // Create permission
-export const createPermission = async (data) => {
+const createPermission = async (data) => {
   try {
     const response = await api.post('/v1/user/permissions', data);
     return response.data;
@@ -95,7 +95,7 @@ export const createPermission = async (data) => {
 };
 
 // Update permission
-export const updatePermission = async (permissionId, data) => {
+const updatePermission = async (permissionId, data) => {
   try {
     const response = await api.put(`/v1/user/permissions/${permissionId}`, data);
     return response.data;
@@ -106,7 +106,7 @@ export const updatePermission = async (permissionId, data) => {
 };
 
 // Delete permission
-export const deletePermission = async (permissionId) => {
+const deletePermission = async (permissionId) => {
   try {
     await api.delete(`/v1/user/permissions/${permissionId}`);
   } catch (error) {
@@ -116,7 +116,7 @@ export const deletePermission = async (permissionId) => {
 };
 
 // Get role permissions
-export const getRolePermissions = async (roleId) => {
+const getRolePermissions = async (roleId) => {
   try {
     const response = await api.get(`/v1/user/roles/${roleId}/permissions`);
     return response.data;
@@ -127,7 +127,7 @@ export const getRolePermissions = async (roleId) => {
 };
 
 // Assign permission to role
-export const assignPermissionToRole = async (roleId, permissionId) => {
+const assignPermissionToRole = async (roleId, permissionId) => {
   try {
     const response = await api.post('/v1/user/role-permissions', {
       role_id: roleId,
@@ -141,7 +141,7 @@ export const assignPermissionToRole = async (roleId, permissionId) => {
 };
 
 // Remove permission from role
-export const removePermissionFromRole = async (roleId, permissionId) => {
+const removePermissionFromRole = async (roleId, permissionId) => {
   try {
     await api.delete('/v1/user/role-permissions', {
       data: {
@@ -156,7 +156,7 @@ export const removePermissionFromRole = async (roleId, permissionId) => {
 };
 
 // List role permissions
-export const listRolePermissions = async () => {
+const listRolePermissions = async () => {
   try {
     const response = await api.get('/v1/user/role-permissions');
     return response.data;
@@ -167,7 +167,7 @@ export const listRolePermissions = async () => {
 };
 
 // Validate role
-export const validateRole = async (requiredRoles) => {
+const validateRole = async (requiredRoles) => {
   try {
     const response = await api.post('/v1/user/role-validator', {
       required_roles: requiredRoles,
@@ -177,4 +177,22 @@ export const validateRole = async (requiredRoles) => {
     console.error('validateRole failed', error);
     throw error;
   }
+};
+
+export const rolesApi = {
+  getRoles,
+  getRole,
+  createRole,
+  updateRole,
+  deleteRole,
+  getPermissions,
+  getPermission,
+  createPermission,
+  updatePermission,
+  deletePermission,
+  getRolePermissions,
+  assignPermissionToRole,
+  removePermissionFromRole,
+  listRolePermissions,
+  validateRole,
 };

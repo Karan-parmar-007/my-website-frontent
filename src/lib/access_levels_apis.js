@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 // Get all access levels
-export const getAllAccessLevels = async () => {
+const getAllAccessLevels = async () => {
   try {
     const response = await api.get('/v1/project/access-levels');
     return response.data;
@@ -19,7 +19,7 @@ export const getAllAccessLevels = async () => {
 };
 
 // Get single access level by ID
-export const getAccessLevel = async (accessLevelId) => {
+const getAccessLevel = async (accessLevelId) => {
   try {
     const response = await api.get(`/v1/project/access-levels/${accessLevelId}`);
     return response.data;
@@ -30,7 +30,7 @@ export const getAccessLevel = async (accessLevelId) => {
 };
 
 // Create access level
-export const createAccessLevel = async (data) => {
+const createAccessLevel = async (data) => {
   try {
     const response = await api.post('/v1/project/access-levels', data);
     return response.data;
@@ -41,7 +41,7 @@ export const createAccessLevel = async (data) => {
 };
 
 // Update access level
-export const updateAccessLevel = async (accessLevelId, data) => {
+const updateAccessLevel = async (accessLevelId, data) => {
   try {
     const response = await api.put(`/v1/project/access-levels/${accessLevelId}`, data);
     return response.data;
@@ -52,11 +52,19 @@ export const updateAccessLevel = async (accessLevelId, data) => {
 };
 
 // Delete access level
-export const deleteAccessLevel = async (accessLevelId) => {
+const deleteAccessLevel = async (accessLevelId) => {
   try {
     await api.delete(`/v1/project/access-levels/${accessLevelId}`);
   } catch (error) {
     console.error('deleteAccessLevel failed', error);
     throw error;
   }
+};
+
+export const accessLevelsApi = {
+  getAllAccessLevels,
+  getAccessLevel,
+  createAccessLevel,
+  updateAccessLevel,
+  deleteAccessLevel,
 };

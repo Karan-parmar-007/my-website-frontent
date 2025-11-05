@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 // Get all users with pagination
-export const getAllUsers = async (page = 1, size = 20) => {
+const getAllUsers = async (page = 1, size = 20) => {
   try {
     const response = await api.get('/v1/user/users', {
       params: { page, size },
@@ -21,7 +21,7 @@ export const getAllUsers = async (page = 1, size = 20) => {
 };
 
 // Search users with pagination
-export const searchUsers = async (query, page = 1, size = 20) => {
+const searchUsers = async (query, page = 1, size = 20) => {
   try {
     const response = await api.get('/v1/user/search', {
       params: { q: query, page, size },
@@ -34,7 +34,7 @@ export const searchUsers = async (query, page = 1, size = 20) => {
 };
 
 // Get user suggestions
-export const getUserSuggestions = async (query, limit = 5) => {
+const getUserSuggestions = async (query, limit = 5) => {
   try {
     const response = await api.get('/v1/user/suggestion', {
       params: { q: query, limit },
@@ -47,7 +47,7 @@ export const getUserSuggestions = async (query, limit = 5) => {
 };
 
 // Create user by admin
-export const createUser = async (data) => {
+const createUser = async (data) => {
   try {
     const response = await api.post('/v1/user/admin/users', data);
     return response.data;
@@ -58,7 +58,7 @@ export const createUser = async (data) => {
 };
 
 // Update user by admin
-export const updateUser = async (userId, data) => {
+const updateUser = async (userId, data) => {
   try {
     const response = await api.put(`/v1/user/users/${userId}`, data);
     return response.data;
@@ -69,11 +69,20 @@ export const updateUser = async (userId, data) => {
 };
 
 // Delete user by admin
-export const deleteUser = async (userId) => {
+const deleteUser = async (userId) => {
   try {
     await api.delete(`/v1/user/admin/users/${userId}`);
   } catch (error) {
     console.error('deleteUser failed', error);
     throw error;
   }
+};
+
+export const usersApi = {
+  getAllUsers,
+  searchUsers,
+  getUserSuggestions,
+  createUser,
+  updateUser,
+  deleteUser,
 };

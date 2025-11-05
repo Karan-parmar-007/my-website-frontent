@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 // Profile Info
-export const getProfileInfo = async () => {
+const getProfileInfo = async () => {
   try {
     const response = await api.get('/v1/portfolio/profile-info');
     return response.data;
@@ -18,7 +18,7 @@ export const getProfileInfo = async () => {
   }
 };
 
-export const createProfileInfo = async (formData) => {
+const createProfileInfo = async (formData) => {
   try {
     const response = await api.post('/v1/portfolio/profile-info', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -30,7 +30,7 @@ export const createProfileInfo = async (formData) => {
   }
 };
 
-export const updateProfileInfo = async (formData) => {
+const updateProfileInfo = async (formData) => {
   try {
     const response = await api.put('/v1/portfolio/profile-info', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -42,7 +42,7 @@ export const updateProfileInfo = async (formData) => {
   }
 };
 
-export const deleteProfileInfo = async () => {
+const deleteProfileInfo = async () => {
   try {
     await api.delete('/v1/portfolio/profile-info');
   } catch (error) {
@@ -52,7 +52,7 @@ export const deleteProfileInfo = async () => {
 };
 
 // Education
-export const getEducation = async () => {
+const getEducation = async () => {
   try {
     const response = await api.get('/v1/portfolio/education');
     return response.data;
@@ -62,7 +62,7 @@ export const getEducation = async () => {
   }
 };
 
-export const createEducation = async (data) => {
+const createEducation = async (data) => {
   try {
     const response = await api.post('/v1/portfolio/education', data);
     return response.data;
@@ -72,7 +72,7 @@ export const createEducation = async (data) => {
   }
 };
 
-export const updateEducation = async (data) => {
+const updateEducation = async (data) => {
   try {
     const response = await api.put('/v1/portfolio/education', data);
     return response.data;
@@ -82,7 +82,7 @@ export const updateEducation = async (data) => {
   }
 };
 
-export const deleteEducation = async (educationId) => {
+const deleteEducation = async (educationId) => {
   try {
     await api.delete(`/v1/portfolio/education/${educationId}`);
   } catch (error) {
@@ -92,7 +92,7 @@ export const deleteEducation = async (educationId) => {
 };
 
 // Work Experience
-export const getWorkExperience = async () => {
+const getWorkExperience = async () => {
   try {
     const response = await api.get('/v1/portfolio/work-experience');
     return response.data;
@@ -102,7 +102,7 @@ export const getWorkExperience = async () => {
   }
 };
 
-export const createWorkExperience = async (data) => {
+const createWorkExperience = async (data) => {
   try {
     const response = await api.post('/v1/portfolio/work-experience', data);
     return response.data;
@@ -112,7 +112,7 @@ export const createWorkExperience = async (data) => {
   }
 };
 
-export const updateWorkExperience = async (data) => {
+const updateWorkExperience = async (data) => {
   try {
     const response = await api.put('/v1/portfolio/work-experience', data);
     return response.data;
@@ -122,7 +122,7 @@ export const updateWorkExperience = async (data) => {
   }
 };
 
-export const deleteWorkExperience = async (workExperienceId) => {
+const deleteWorkExperience = async (workExperienceId) => {
   try {
     await api.delete(`/v1/portfolio/work-experience/${workExperienceId}`);
   } catch (error) {
@@ -132,7 +132,7 @@ export const deleteWorkExperience = async (workExperienceId) => {
 };
 
 // Skill Categories
-export const getSkillCategories = async () => {
+const getSkillCategories = async () => {
   try {
     const response = await api.get('/v1/portfolio/skill-categories');
     return response.data;
@@ -142,7 +142,7 @@ export const getSkillCategories = async () => {
   }
 };
 
-export const createSkillCategory = async (data) => {
+const createSkillCategory = async (data) => {
   try {
     const response = await api.post('/v1/portfolio/skill-categories', data);
     return response.data;
@@ -152,7 +152,7 @@ export const createSkillCategory = async (data) => {
   }
 };
 
-export const updateSkillCategory = async (data) => {
+const updateSkillCategory = async (data) => {
   try {
     const response = await api.put('/v1/portfolio/skill-categories', data);
     return response.data;
@@ -162,7 +162,7 @@ export const updateSkillCategory = async (data) => {
   }
 };
 
-export const deleteSkillCategory = async (categoryId) => {
+const deleteSkillCategory = async (categoryId) => {
   try {
     await api.delete(`/v1/portfolio/skill-categories/${categoryId}`);
   } catch (error) {
@@ -172,7 +172,7 @@ export const deleteSkillCategory = async (categoryId) => {
 };
 
 // Skills
-export const getSkills = async () => {
+const getSkills = async () => {
   try {
     const response = await api.get('/v1/portfolio/skills');
     return response.data;
@@ -182,7 +182,7 @@ export const getSkills = async () => {
   }
 };
 
-export const createSkill = async (formData) => {
+const createSkill = async (formData) => {
   try {
     const response = await api.post('/v1/portfolio/skills', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -194,7 +194,7 @@ export const createSkill = async (formData) => {
   }
 };
 
-export const updateSkill = async (formData) => {
+const updateSkill = async (formData) => {
   try {
     const response = await api.put('/v1/portfolio/skills', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -206,11 +206,34 @@ export const updateSkill = async (formData) => {
   }
 };
 
-export const deleteSkill = async (skillId) => {
+const deleteSkill = async (skillId) => {
   try {
     await api.delete(`/v1/portfolio/skills/${skillId}`);
   } catch (error) {
     console.error('deleteSkill failed', error);
     throw error;
   }
+};
+
+export const portfolioAdminApi = {
+  getProfileInfo,
+  createProfileInfo,
+  updateProfileInfo,
+  deleteProfileInfo,
+  getEducation,
+  createEducation,
+  updateEducation,
+  deleteEducation,
+  getWorkExperience,
+  createWorkExperience,
+  updateWorkExperience,
+  deleteWorkExperience,
+  getSkillCategories,
+  createSkillCategory,
+  updateSkillCategory,
+  deleteSkillCategory,
+  getSkills,
+  createSkill,
+  updateSkill,
+  deleteSkill,
 };

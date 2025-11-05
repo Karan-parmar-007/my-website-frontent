@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 // Login with JSON body
-export const loginUser = async ({ email, password }) => {
+const loginUser = async ({ email, password }) => {
   try {
     const response = await api.post('/v1/user/login', { email, password });
     return response.data;
@@ -19,7 +19,7 @@ export const loginUser = async ({ email, password }) => {
 };
 
 // Register with JSON body
-export const registerUser = async ({ name, email, password }) => {
+const registerUser = async ({ name, email, password }) => {
   try {
     const response = await api.post('/v1/user/register', {
       preferred_name: name,
@@ -34,7 +34,7 @@ export const registerUser = async ({ name, email, password }) => {
 };
 
 // Current user
-export const getCurrentUser = async () => {
+const getCurrentUser = async () => {
   try {
     const response = await api.get('/v1/user/me');
     return response.data;
@@ -45,7 +45,7 @@ export const getCurrentUser = async () => {
 };
 
 // Logout
-export const logoutUser = async () => {
+const logoutUser = async () => {
   try {
     await api.post('/v1/user/logout');
     return true;
@@ -56,7 +56,7 @@ export const logoutUser = async () => {
 };
 
 // Register (axios version)
-export const register = async (userData) => {
+const register = async (userData) => {
   try {
     const response = await api.post('/v1/user/register', {
       preferred_name: userData.name,
@@ -71,7 +71,7 @@ export const register = async (userData) => {
 };
 
 // Login (axios version)
-export const login = async (credentials) => {
+const login = async (credentials) => {
   try {
     const response = await api.post('/v1/user/login', {
       email: credentials.email,
@@ -85,7 +85,7 @@ export const login = async (credentials) => {
 };
 
 // Logout (axios version)
-export const logout = async () => {
+const logout = async () => {
   try {
     const response = await api.post('/v1/user/logout');
     return response.data;
@@ -96,7 +96,7 @@ export const logout = async () => {
 };
 
 // Verify session
-export const verifySession = async () => {
+const verifySession = async () => {
   try {
     const response = await api.get('/v1/user/me');
     return response.data;
@@ -107,7 +107,7 @@ export const verifySession = async () => {
 };
 
 // Validate user roles
-export const validateUserRole = async (requiredRoles) => {
+const validateUserRole = async (requiredRoles) => {
   try {
     const response = await api.post('/v1/user/role-validator', { required_roles: requiredRoles });
     return response.data;
@@ -115,4 +115,16 @@ export const validateUserRole = async (requiredRoles) => {
     console.error('validateUserRole failed', error);
     throw error;
   }
+};
+
+export const userApi = {
+  loginUser,
+  registerUser,
+  getCurrentUser,
+  logoutUser,
+  register,
+  login,
+  logout,
+  verifySession,
+  validateUserRole,
 };

@@ -7,7 +7,7 @@ const api = axios.create({
 });
 
 // Get featured projects
-export const getFeaturedProjects = async () => {
+const getFeaturedProjects = async () => {
   try {
     const response = await api.get('/v1/project/projects/featured');
     return response.data;
@@ -18,7 +18,7 @@ export const getFeaturedProjects = async () => {
 };
 
 // Get latest projects
-export const getLatestProjects = async () => {
+const getLatestProjects = async () => {
   try {
     const response = await api.get('/v1/project/projects/latest');
     return response.data;
@@ -29,7 +29,7 @@ export const getLatestProjects = async () => {
 };
 
 // Get all projects with pagination
-export const getAllProjects = async (page = 1, size = 12) => {
+const getAllProjects = async (page = 1, size = 12) => {
   try {
     const response = await api.get('/v1/project/projects', {
       params: { page, size },
@@ -42,7 +42,7 @@ export const getAllProjects = async (page = 1, size = 12) => {
 };
 
 // Search projects
-export const searchProjects = async (query, page = 1, size = 12) => {
+const searchProjects = async (query, page = 1, size = 12) => {
   try {
     const response = await api.get('/v1/project/projects/search', {
       params: { q: query, page, size },
@@ -55,7 +55,7 @@ export const searchProjects = async (query, page = 1, size = 12) => {
 };
 
 // Get project suggestions
-export const getProjectSuggestions = async (query, limit = 5) => {
+const getProjectSuggestions = async (query, limit = 5) => {
   try {
     const response = await api.get('/v1/project/projects/suggestion', {
       params: { q: query, limit },
@@ -65,4 +65,12 @@ export const getProjectSuggestions = async (query, limit = 5) => {
     console.error('getProjectSuggestions failed', error);
     throw error;
   }
+};
+
+export const publicProjectsApi = {
+  getFeaturedProjects,
+  getLatestProjects,
+  getAllProjects,
+  searchProjects,
+  getProjectSuggestions,
 };

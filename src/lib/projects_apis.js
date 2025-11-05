@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 // Get all projects with pagination
-export const getAllProjects = async (page = 1, size = 20) => {
+const getAllProjects = async (page = 1, size = 20) => {
   try {
     const response = await api.get('/v1/project/admin/projects', {
       params: { page, size },
@@ -21,7 +21,7 @@ export const getAllProjects = async (page = 1, size = 20) => {
 };
 
 // Get single project by ID
-export const getProject = async (projectId) => {
+const getProject = async (projectId) => {
   try {
     const response = await api.get(`/v1/project/admin/projects/${projectId}`);
     return response.data;
@@ -32,7 +32,7 @@ export const getProject = async (projectId) => {
 };
 
 // Create project
-export const createProject = async (formData) => {
+const createProject = async (formData) => {
   try {
     const response = await api.post('/v1/project/admin/projects', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -45,7 +45,7 @@ export const createProject = async (formData) => {
 };
 
 // Update project
-export const updateProject = async (projectId, formData) => {
+const updateProject = async (projectId, formData) => {
   try {
     const response = await api.put(`/v1/project/admin/projects/${projectId}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -58,7 +58,7 @@ export const updateProject = async (projectId, formData) => {
 };
 
 // Delete project
-export const deleteProject = async (projectId) => {
+const deleteProject = async (projectId) => {
   try {
     await api.delete(`/v1/project/admin/projects/${projectId}`);
   } catch (error) {
@@ -68,7 +68,7 @@ export const deleteProject = async (projectId) => {
 };
 
 // Search projects with pagination
-export const searchProjects = async (query, page = 1, size = 20) => {
+const searchProjects = async (query, page = 1, size = 20) => {
   try {
     const response = await api.get('/v1/project/admin/projects/search', {
       params: { q: query, page, size },
@@ -81,7 +81,7 @@ export const searchProjects = async (query, page = 1, size = 20) => {
 };
 
 // Get project suggestions
-export const getProjectSuggestions = async (query, limit = 5) => {
+const getProjectSuggestions = async (query, limit = 5) => {
   try {
     const response = await api.get('/v1/project/admin/projects/suggestion', {
       params: { q: query, limit },
@@ -91,4 +91,14 @@ export const getProjectSuggestions = async (query, limit = 5) => {
     console.error('getProjectSuggestions failed', error);
     throw error;
   }
+};
+
+export const projectsApi = {
+  getAllProjects,
+  getProject,
+  createProject,
+  updateProject,
+  deleteProject,
+  searchProjects,
+  getProjectSuggestions,
 };

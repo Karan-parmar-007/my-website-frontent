@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 // Get all memberships
-export const getAllMemberships = async () => {
+const getAllMemberships = async () => {
   try {
     const response = await api.get('/v1/project/memberships');
     return response.data;
@@ -19,7 +19,7 @@ export const getAllMemberships = async () => {
 };
 
 // Get memberships by project
-export const getMembershipsByProject = async (projectId) => {
+const getMembershipsByProject = async (projectId) => {
   try {
     const response = await api.get(`/v1/project/memberships/project/${projectId}`);
     return response.data;
@@ -30,7 +30,7 @@ export const getMembershipsByProject = async (projectId) => {
 };
 
 // Get memberships by user
-export const getMembershipsByUser = async (userId) => {
+const getMembershipsByUser = async (userId) => {
   try {
     const response = await api.get(`/v1/project/memberships/user/${userId}`);
     return response.data;
@@ -41,7 +41,7 @@ export const getMembershipsByUser = async (userId) => {
 };
 
 // Search users in project
-export const searchUsersInProject = async (projectId, query, limit = 20) => {
+const searchUsersInProject = async (projectId, query, limit = 20) => {
   try {
     const response = await api.get('/v1/project/memberships/search', {
       params: { project_id: projectId, q: query, limit },
@@ -54,7 +54,7 @@ export const searchUsersInProject = async (projectId, query, limit = 20) => {
 };
 
 // Create membership
-export const createMembership = async (data) => {
+const createMembership = async (data) => {
   try {
     const response = await api.post('/v1/project/memberships', data);
     return response.data;
@@ -65,7 +65,7 @@ export const createMembership = async (data) => {
 };
 
 // Remove membership
-export const removeMembership = async (userId, projectId) => {
+const removeMembership = async (userId, projectId) => {
   try {
     await api.delete('/v1/project/memberships', {
       params: { user_id: userId, project_id: projectId },
@@ -74,4 +74,13 @@ export const removeMembership = async (userId, projectId) => {
     console.error('removeMembership failed', error);
     throw error;
   }
+};
+
+export const projectMembershipApi = {
+  getAllMemberships,
+  getMembershipsByProject,
+  getMembershipsByUser,
+  searchUsersInProject,
+  createMembership,
+  removeMembership,
 };
