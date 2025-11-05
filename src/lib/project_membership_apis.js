@@ -1,49 +1,77 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/v1`,
+  baseURL: apiUrl,
   withCredentials: true,
 });
 
-export const projectMembershipApi = {
-  // Get all memberships
-  getAllMemberships: async () => {
-    const response = await api.get('/project/memberships');
+// Get all memberships
+export const getAllMemberships = async () => {
+  try {
+    const response = await api.get('/v1/project/memberships');
     return response.data;
-  },
+  } catch (error) {
+    console.error('getAllMemberships failed', error);
+    throw error;
+  }
+};
 
-  // Get memberships by project
-  getMembershipsByProject: async (projectId) => {
-    const response = await api.get(`/project/memberships/project/${projectId}`);
+// Get memberships by project
+export const getMembershipsByProject = async (projectId) => {
+  try {
+    const response = await api.get(`/v1/project/memberships/project/${projectId}`);
     return response.data;
-  },
+  } catch (error) {
+    console.error('getMembershipsByProject failed', error);
+    throw error;
+  }
+};
 
-  // Get memberships by user
-  getMembershipsByUser: async (userId) => {
-    const response = await api.get(`/project/memberships/user/${userId}`);
+// Get memberships by user
+export const getMembershipsByUser = async (userId) => {
+  try {
+    const response = await api.get(`/v1/project/memberships/user/${userId}`);
     return response.data;
-  },
+  } catch (error) {
+    console.error('getMembershipsByUser failed', error);
+    throw error;
+  }
+};
 
-  // Search users in project
-  searchUsersInProject: async (projectId, query, limit = 20) => {
-    const response = await api.get('/project/memberships/search', {
+// Search users in project
+export const searchUsersInProject = async (projectId, query, limit = 20) => {
+  try {
+    const response = await api.get('/v1/project/memberships/search', {
       params: { project_id: projectId, q: query, limit },
     });
     return response.data;
-  },
+  } catch (error) {
+    console.error('searchUsersInProject failed', error);
+    throw error;
+  }
+};
 
-  // Create membership (add user to project)
-  createMembership: async (data) => {
-    const response = await api.post('/project/memberships', data);
+// Create membership
+export const createMembership = async (data) => {
+  try {
+    const response = await api.post('/v1/project/memberships', data);
     return response.data;
-  },
+  } catch (error) {
+    console.error('createMembership failed', error);
+    throw error;
+  }
+};
 
-  // Remove membership (remove user from project)
-  removeMembership: async (userId, projectId) => {
-    await api.delete('/project/memberships', {
+// Remove membership
+export const removeMembership = async (userId, projectId) => {
+  try {
+    await api.delete('/v1/project/memberships', {
       params: { user_id: userId, project_id: projectId },
     });
-  },
+  } catch (error) {
+    console.error('removeMembership failed', error);
+    throw error;
+  }
 };

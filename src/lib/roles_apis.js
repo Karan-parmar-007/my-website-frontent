@@ -1,96 +1,180 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/v1`,
+  baseURL: apiUrl,
   withCredentials: true,
 });
 
-export const rolesApi = {
-  // Roles CRUD
-  getRoles: async () => {
-    const response = await api.get('/user/roles');
+// Get all roles
+export const getRoles = async () => {
+  try {
+    const response = await api.get('/v1/user/roles');
     return response.data;
-  },
+  } catch (error) {
+    console.error('getRoles failed', error);
+    throw error;
+  }
+};
 
-  getRole: async (roleId) => {
-    const response = await api.get(`/user/roles/${roleId}`);
+// Get role by ID
+export const getRole = async (roleId) => {
+  try {
+    const response = await api.get(`/v1/user/roles/${roleId}`);
     return response.data;
-  },
+  } catch (error) {
+    console.error('getRole failed', error);
+    throw error;
+  }
+};
 
-  createRole: async (data) => {
-    const response = await api.post('/user/roles', data);
+// Create role
+export const createRole = async (data) => {
+  try {
+    const response = await api.post('/v1/user/roles', data);
     return response.data;
-  },
+  } catch (error) {
+    console.error('createRole failed', error);
+    throw error;
+  }
+};
 
-  updateRole: async (roleId, data) => {
-    const response = await api.put(`/user/roles/${roleId}`, data);
+// Update role
+export const updateRole = async (roleId, data) => {
+  try {
+    const response = await api.put(`/v1/user/roles/${roleId}`, data);
     return response.data;
-  },
+  } catch (error) {
+    console.error('updateRole failed', error);
+    throw error;
+  }
+};
 
-  deleteRole: async (roleId) => {
-    await api.delete(`/user/roles/${roleId}`);
-  },
+// Delete role
+export const deleteRole = async (roleId) => {
+  try {
+    await api.delete(`/v1/user/roles/${roleId}`);
+  } catch (error) {
+    console.error('deleteRole failed', error);
+    throw error;
+  }
+};
 
-  // Permissions CRUD
-  getPermissions: async () => {
-    const response = await api.get('/user/permissions');
+// Get all permissions
+export const getPermissions = async () => {
+  try {
+    const response = await api.get('/v1/user/permissions');
     return response.data;
-  },
+  } catch (error) {
+    console.error('getPermissions failed', error);
+    throw error;
+  }
+};
 
-  getPermission: async (permissionId) => {
-    const response = await api.get(`/user/permissions/${permissionId}`);
+// Get permission by ID
+export const getPermission = async (permissionId) => {
+  try {
+    const response = await api.get(`/v1/user/permissions/${permissionId}`);
     return response.data;
-  },
+  } catch (error) {
+    console.error('getPermission failed', error);
+    throw error;
+  }
+};
 
-  createPermission: async (data) => {
-    const response = await api.post('/user/permissions', data);
+// Create permission
+export const createPermission = async (data) => {
+  try {
+    const response = await api.post('/v1/user/permissions', data);
     return response.data;
-  },
+  } catch (error) {
+    console.error('createPermission failed', error);
+    throw error;
+  }
+};
 
-  updatePermission: async (permissionId, data) => {
-    const response = await api.put(`/user/permissions/${permissionId}`, data);
+// Update permission
+export const updatePermission = async (permissionId, data) => {
+  try {
+    const response = await api.put(`/v1/user/permissions/${permissionId}`, data);
     return response.data;
-  },
+  } catch (error) {
+    console.error('updatePermission failed', error);
+    throw error;
+  }
+};
 
-  deletePermission: async (permissionId) => {
-    await api.delete(`/user/permissions/${permissionId}`);
-  },
+// Delete permission
+export const deletePermission = async (permissionId) => {
+  try {
+    await api.delete(`/v1/user/permissions/${permissionId}`);
+  } catch (error) {
+    console.error('deletePermission failed', error);
+    throw error;
+  }
+};
 
-  // Role Permissions
-  getRolePermissions: async (roleId) => {
-    const response = await api.get(`/user/roles/${roleId}/permissions`);
+// Get role permissions
+export const getRolePermissions = async (roleId) => {
+  try {
+    const response = await api.get(`/v1/user/roles/${roleId}/permissions`);
     return response.data;
-  },
+  } catch (error) {
+    console.error('getRolePermissions failed', error);
+    throw error;
+  }
+};
 
-  assignPermissionToRole: async (roleId, permissionId) => {
-    const response = await api.post('/user/role-permissions', {
+// Assign permission to role
+export const assignPermissionToRole = async (roleId, permissionId) => {
+  try {
+    const response = await api.post('/v1/user/role-permissions', {
       role_id: roleId,
       permission_id: permissionId,
     });
     return response.data;
-  },
+  } catch (error) {
+    console.error('assignPermissionToRole failed', error);
+    throw error;
+  }
+};
 
-  removePermissionFromRole: async (roleId, permissionId) => {
-    await api.delete('/user/role-permissions', {
+// Remove permission from role
+export const removePermissionFromRole = async (roleId, permissionId) => {
+  try {
+    await api.delete('/v1/user/role-permissions', {
       data: {
         role_id: roleId,
         permission_id: permissionId,
       },
     });
-  },
+  } catch (error) {
+    console.error('removePermissionFromRole failed', error);
+    throw error;
+  }
+};
 
-  listRolePermissions: async () => {
-    const response = await api.get('/user/role-permissions');
+// List role permissions
+export const listRolePermissions = async () => {
+  try {
+    const response = await api.get('/v1/user/role-permissions');
     return response.data;
-  },
+  } catch (error) {
+    console.error('listRolePermissions failed', error);
+    throw error;
+  }
+};
 
-  // Role Validator
-  validateRole: async (requiredRoles) => {
-    const response = await api.post('/user/role-validator', {
+// Validate role
+export const validateRole = async (requiredRoles) => {
+  try {
+    const response = await api.post('/v1/user/role-validator', {
       required_roles: requiredRoles,
     });
     return response.data;
-  },
+  } catch (error) {
+    console.error('validateRole failed', error);
+    throw error;
+  }
 };

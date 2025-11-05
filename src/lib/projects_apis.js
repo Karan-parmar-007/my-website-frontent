@@ -1,61 +1,94 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/v1`,
+  baseURL: apiUrl,
   withCredentials: true,
 });
 
-export const projectsApi = {
-  // Get all projects with pagination
-  getAllProjects: async (page = 1, size = 20) => {
-    const response = await api.get('/project/admin/projects', {
+// Get all projects with pagination
+export const getAllProjects = async (page = 1, size = 20) => {
+  try {
+    const response = await api.get('/v1/project/admin/projects', {
       params: { page, size },
     });
     return response.data;
-  },
+  } catch (error) {
+    console.error('getAllProjects failed', error);
+    throw error;
+  }
+};
 
-  // Get single project by ID
-  getProject: async (projectId) => {
-    const response = await api.get(`/project/admin/projects/${projectId}`);
+// Get single project by ID
+export const getProject = async (projectId) => {
+  try {
+    const response = await api.get(`/v1/project/admin/projects/${projectId}`);
     return response.data;
-  },
+  } catch (error) {
+    console.error('getProject failed', error);
+    throw error;
+  }
+};
 
-  // Create project
-  createProject: async (formData) => {
-    const response = await api.post('/project/admin/projects', formData, {
+// Create project
+export const createProject = async (formData) => {
+  try {
+    const response = await api.post('/v1/project/admin/projects', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
-  },
+  } catch (error) {
+    console.error('createProject failed', error);
+    throw error;
+  }
+};
 
-  // Update project
-  updateProject: async (projectId, formData) => {
-    const response = await api.put(`/project/admin/projects/${projectId}`, formData, {
+// Update project
+export const updateProject = async (projectId, formData) => {
+  try {
+    const response = await api.put(`/v1/project/admin/projects/${projectId}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
-  },
+  } catch (error) {
+    console.error('updateProject failed', error);
+    throw error;
+  }
+};
 
-  // Delete project
-  deleteProject: async (projectId) => {
-    await api.delete(`/project/admin/projects/${projectId}`);
-  },
+// Delete project
+export const deleteProject = async (projectId) => {
+  try {
+    await api.delete(`/v1/project/admin/projects/${projectId}`);
+  } catch (error) {
+    console.error('deleteProject failed', error);
+    throw error;
+  }
+};
 
-  // Search projects with pagination
-  searchProjects: async (query, page = 1, size = 20) => {
-    const response = await api.get('/project/admin/projects/search', {
+// Search projects with pagination
+export const searchProjects = async (query, page = 1, size = 20) => {
+  try {
+    const response = await api.get('/v1/project/admin/projects/search', {
       params: { q: query, page, size },
     });
     return response.data;
-  },
+  } catch (error) {
+    console.error('searchProjects failed', error);
+    throw error;
+  }
+};
 
-  // Get project suggestions
-  getProjectSuggestions: async (query, limit = 5) => {
-    const response = await api.get('/project/admin/projects/suggestion', {
+// Get project suggestions
+export const getProjectSuggestions = async (query, limit = 5) => {
+  try {
+    const response = await api.get('/v1/project/admin/projects/suggestion', {
       params: { q: query, limit },
     });
     return response.data;
-  },
+  } catch (error) {
+    console.error('getProjectSuggestions failed', error);
+    throw error;
+  }
 };
