@@ -1,34 +1,41 @@
 import axios from 'axios';
 
-// Use VITE env with a fallback and a clear name
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-console.log(`API_BASE_URL: ${API_BASE_URL}`);
+const apiUrl = import.meta.env.VITE_API_URL;
 
-const API_PREFIX = '/v1';
-const API_V1_BASE_URL = `${API_BASE_URL}${API_PREFIX}`;
-
-// Axios instance with cookies
-const apiClient = axios.create({
-  baseURL: API_V1_BASE_URL,
+const api = axios.create({
+  baseURL: apiUrl,
   withCredentials: true,
-  headers: { 'Content-Type': 'application/json' },
 });
 
-export const portfolioApi = {
-  getProfileInfo: async () => {
-    const response = await apiClient.get('/portfolio/profile-info');
+// Get profile info
+export const getProfileInfo = async () => {
+  try {
+    const response = await api.get('/v1/portfolio/profile-info');
     return response.data;
-  },
-  
-  getEducation: async () => {
-    const response = await apiClient.get('/portfolio/education');
-    return response.data;
-  },
-  
-  getWorkExperience: async () => {
-    const response = await apiClient.get('/portfolio/work-experience');
-    return response.data;
-  },
+  } catch (error) {
+    console.error('getProfileInfo failed', error);
+    throw error;
+  }
 };
 
-export default apiClient;
+// Get education
+export const getEducation = async () => {
+  try {
+    const response = await api.get('/v1/portfolio/education');
+    return response.data;
+  } catch (error) {
+    console.error('getEducation failed', error);
+    throw error;
+  }
+};
+
+// Get work experience
+export const getWorkExperience = async () => {
+  try {
+    const response = await api.get('/v1/portfolio/work-experience');
+    return response.data;
+  } catch (error) {
+    console.error('getWorkExperience failed', error);
+    throw error;
+  }
+};
