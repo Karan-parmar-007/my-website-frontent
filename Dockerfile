@@ -1,21 +1,29 @@
+# -------------------------------
+# Stage 1: Build frontend (GitHub Actions)
+# -------------------------------
 FROM node:20-alpine AS builder
-
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
 RUN npm ci
 
-# Copy source code
 COPY . .
-
-# Build with API URL (will be passed as build arg)
-ENV VITE_API_URL=${VITE_API_URL}
 RUN npm run build
 
-# Production stage
+# -------------------------------
+# Stage 2: Serve static files with Nginx + dynamic env
+# -------------------------------
 FROM nginx:alpine
+
+# Copy built files
 COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy base nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# 👇 Add entrypoint script
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
