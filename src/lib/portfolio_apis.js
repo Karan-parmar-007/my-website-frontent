@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 // Get profile info
-export const getProfileInfo = async () => {
+const getProfileInfo = async () => {
   try {
     const response = await api.get('/v1/portfolio/profile-info');
     return response.data;
@@ -19,7 +19,7 @@ export const getProfileInfo = async () => {
 };
 
 // Get education
-export const getEducation = async () => {
+const getEducation = async () => {
   try {
     const response = await api.get('/v1/portfolio/education');
     return response.data;
@@ -30,7 +30,7 @@ export const getEducation = async () => {
 };
 
 // Get work experience
-export const getWorkExperience = async () => {
+const getWorkExperience = async () => {
   try {
     const response = await api.get('/v1/portfolio/work-experience');
     return response.data;
@@ -38,4 +38,10 @@ export const getWorkExperience = async () => {
     console.error('getWorkExperience failed', error);
     throw error;
   }
+};
+
+export const portfolioApi = {
+  getProfileInfo,
+  getEducation,
+  getWorkExperience,
 };
