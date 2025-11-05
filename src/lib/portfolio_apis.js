@@ -1,31 +1,34 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+// Use VITE env with a fallback and a clear name
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
 console.log(`API_BASE_URL: ${API_BASE_URL}`);
 
+const API_PREFIX = '/v1';
+const API_V1_BASE_URL = `${API_BASE_URL}${API_PREFIX}`;
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+// Axios instance with cookies
+const apiClient = axios.create({
+  baseURL: API_V1_BASE_URL,
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
 });
 
 export const portfolioApi = {
   getProfileInfo: async () => {
-    const response = await api.get('/v1/portfolio/profile-info');
+    const response = await apiClient.get('/portfolio/profile-info');
     return response.data;
   },
   
   getEducation: async () => {
-    const response = await api.get('/v1/portfolio/education');
+    const response = await apiClient.get('/portfolio/education');
     return response.data;
   },
   
   getWorkExperience: async () => {
-    const response = await api.get('/v1/portfolio/work-experience');
+    const response = await apiClient.get('/portfolio/work-experience');
     return response.data;
   },
 };
 
-export default api;
+export default apiClient;
