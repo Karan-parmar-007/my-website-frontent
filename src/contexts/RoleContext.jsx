@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useCallback } from 'react';
-import { validateUserRole } from '../lib/user_apis';
+import { userApi } from '../lib/user_apis';
 import { useAuth } from './AuthContext';
 
 const RoleContext = createContext();
@@ -13,7 +13,7 @@ export const RoleProvider = ({ children }) => {
     }
 
     try {
-      const result = await validateUserRole(requiredRoles);
+      const result = await userApi.validateUserRole(requiredRoles);
       return result.has_role;
     } catch (error) {
       console.error('Role validation error:', error);
