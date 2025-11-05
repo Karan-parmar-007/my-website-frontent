@@ -1,239 +1,118 @@
 import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_API_URL;  // This will be "https://karanparmar.in/api" at build time
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
 
 const api = axios.create({
-  baseURL: apiUrl,  // Sets base to https://karanparmar.in/api
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
-// Profile Info
-const getProfileInfo = async () => {
-  try {
+export const portfolioAdminApi = {
+  // Profile Info
+  getProfileInfo: async () => {
     const response = await api.get('/v1/portfolio/profile-info');
     return response.data;
-  } catch (error) {
-    console.error('getProfileInfo failed', error);
-    throw error;
-  }
-};
-
-const createProfileInfo = async (formData) => {
-  try {
+  },
+  
+  createProfileInfo: async (formData) => {
     const response = await api.post('/v1/portfolio/profile-info', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
-  } catch (error) {
-    console.error('createProfileInfo failed', error);
-    throw error;
-  }
-};
-
-const updateProfileInfo = async (formData) => {
-  try {
+  },
+  
+  updateProfileInfo: async (formData) => {
     const response = await api.put('/v1/portfolio/profile-info', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
-  } catch (error) {
-    console.error('updateProfileInfo failed', error);
-    throw error;
-  }
-};
-
-const deleteProfileInfo = async () => {
-  try {
+  },
+  
+  deleteProfileInfo: async () => {
     await api.delete('/v1/portfolio/profile-info');
-  } catch (error) {
-    console.error('deleteProfileInfo failed', error);
-    throw error;
-  }
-};
+  },
 
-// Education
-const getEducation = async () => {
-  try {
+  // Education
+  getEducation: async () => {
     const response = await api.get('/v1/portfolio/education');
     return response.data;
-  } catch (error) {
-    console.error('getEducation failed', error);
-    throw error;
-  }
-};
-
-const createEducation = async (data) => {
-  try {
+  },
+  
+  createEducation: async (data) => {
     const response = await api.post('/v1/portfolio/education', data);
     return response.data;
-  } catch (error) {
-    console.error('createEducation failed', error);
-    throw error;
-  }
-};
-
-const updateEducation = async (data) => {
-  try {
+  },
+  
+  updateEducation: async (data) => {
     const response = await api.put('/v1/portfolio/education', data);
     return response.data;
-  } catch (error) {
-    console.error('updateEducation failed', error);
-    throw error;
-  }
-};
-
-const deleteEducation = async (educationId) => {
-  try {
+  },
+  
+  deleteEducation: async (educationId) => {
     await api.delete(`/v1/portfolio/education/${educationId}`);
-  } catch (error) {
-    console.error('deleteEducation failed', error);
-    throw error;
-  }
-};
+  },
 
-// Work Experience
-const getWorkExperience = async () => {
-  try {
+  // Work Experience
+  getWorkExperience: async () => {
     const response = await api.get('/v1/portfolio/work-experience');
     return response.data;
-  } catch (error) {
-    console.error('getWorkExperience failed', error);
-    throw error;
-  }
-};
-
-const createWorkExperience = async (data) => {
-  try {
+  },
+  
+  createWorkExperience: async (data) => {
     const response = await api.post('/v1/portfolio/work-experience', data);
     return response.data;
-  } catch (error) {
-    console.error('createWorkExperience failed', error);
-    throw error;
-  }
-};
-
-const updateWorkExperience = async (data) => {
-  try {
+  },
+  
+  updateWorkExperience: async (data) => {
     const response = await api.put('/v1/portfolio/work-experience', data);
     return response.data;
-  } catch (error) {
-    console.error('updateWorkExperience failed', error);
-    throw error;
-  }
-};
-
-const deleteWorkExperience = async (workExperienceId) => {
-  try {
+  },
+  
+  deleteWorkExperience: async (workExperienceId) => {
     await api.delete(`/v1/portfolio/work-experience/${workExperienceId}`);
-  } catch (error) {
-    console.error('deleteWorkExperience failed', error);
-    throw error;
-  }
-};
+  },
 
-// Skill Categories
-const getSkillCategories = async () => {
-  try {
+  // Skill Categories
+  getSkillCategories: async () => {
     const response = await api.get('/v1/portfolio/skill-categories');
     return response.data;
-  } catch (error) {
-    console.error('getSkillCategories failed', error);
-    throw error;
-  }
-};
-
-const createSkillCategory = async (data) => {
-  try {
+  },
+  
+  createSkillCategory: async (data) => {
     const response = await api.post('/v1/portfolio/skill-categories', data);
     return response.data;
-  } catch (error) {
-    console.error('createSkillCategory failed', error);
-    throw error;
-  }
-};
-
-const updateSkillCategory = async (data) => {
-  try {
+  },
+  
+  updateSkillCategory: async (data) => {
     const response = await api.put('/v1/portfolio/skill-categories', data);
     return response.data;
-  } catch (error) {
-    console.error('updateSkillCategory failed', error);
-    throw error;
-  }
-};
-
-const deleteSkillCategory = async (categoryId) => {
-  try {
+  },
+  
+  deleteSkillCategory: async (categoryId) => {
     await api.delete(`/v1/portfolio/skill-categories/${categoryId}`);
-  } catch (error) {
-    console.error('deleteSkillCategory failed', error);
-    throw error;
-  }
-};
+  },
 
-// Skills
-const getSkills = async () => {
-  try {
+  // Skills
+  getSkills: async () => {
     const response = await api.get('/v1/portfolio/skills');
     return response.data;
-  } catch (error) {
-    console.error('getSkills failed', error);
-    throw error;
-  }
-};
-
-const createSkill = async (formData) => {
-  try {
+  },
+  
+  createSkill: async (formData) => {
     const response = await api.post('/v1/portfolio/skills', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
-  } catch (error) {
-    console.error('createSkill failed', error);
-    throw error;
-  }
-};
-
-const updateSkill = async (formData) => {
-  try {
+  },
+  
+  updateSkill: async (formData) => {
     const response = await api.put('/v1/portfolio/skills', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
-  } catch (error) {
-    console.error('updateSkill failed', error);
-    throw error;
-  }
-};
-
-const deleteSkill = async (skillId) => {
-  try {
+  },
+  
+  deleteSkill: async (skillId) => {
     await api.delete(`/v1/portfolio/skills/${skillId}`);
-  } catch (error) {
-    console.error('deleteSkill failed', error);
-    throw error;
-  }
-};
-
-export const portfolioAdminApi = {
-  getProfileInfo,
-  createProfileInfo,
-  updateProfileInfo,
-  deleteProfileInfo,
-  getEducation,
-  createEducation,
-  updateEducation,
-  deleteEducation,
-  getWorkExperience,
-  createWorkExperience,
-  updateWorkExperience,
-  deleteWorkExperience,
-  getSkillCategories,
-  createSkillCategory,
-  updateSkillCategory,
-  deleteSkillCategory,
-  getSkills,
-  createSkill,
-  updateSkill,
-  deleteSkill,
+  },
 };

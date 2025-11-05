@@ -1,76 +1,45 @@
 import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
 
 const api = axios.create({
-  baseURL: apiUrl,
+  baseURL: `${API_BASE_URL}/v1`,
 });
 
-// Get featured projects
-const getFeaturedProjects = async () => {
-  try {
-    const response = await api.get('/v1/project/projects/featured');
+export const publicProjectsApi = {
+  // Get featured projects (top 4)
+  getFeaturedProjects: async () => {
+    const response = await api.get('/project/projects/featured');
     return response.data;
-  } catch (error) {
-    console.error('getFeaturedProjects failed', error);
-    throw error;
-  }
-};
+  },
 
-// Get latest projects
-const getLatestProjects = async () => {
-  try {
-    const response = await api.get('/v1/project/projects/latest');
+  // Get latest non-interesting projects (top 6)
+  getLatestProjects: async () => {
+    const response = await api.get('/project/projects/latest');
     return response.data;
-  } catch (error) {
-    console.error('getLatestProjects failed', error);
-    throw error;
-  }
-};
+  },
 
-// Get all projects with pagination
-const getAllProjects = async (page = 1, size = 12) => {
-  try {
-    const response = await api.get('/v1/project/projects', {
+  // Get all projects with pagination
+  getAllProjects: async (page = 1, size = 12) => {
+    const response = await api.get('/project/projects', {
       params: { page, size },
     });
     return response.data;
-  } catch (error) {
-    console.error('getAllProjects failed', error);
-    throw error;
-  }
-};
+  },
 
-// Search projects
-const searchProjects = async (query, page = 1, size = 12) => {
-  try {
-    const response = await api.get('/v1/project/projects/search', {
+  // Search projects
+  searchProjects: async (query, page = 1, size = 12) => {
+    const response = await api.get('/project/projects/search', {
       params: { q: query, page, size },
     });
     return response.data;
-  } catch (error) {
-    console.error('searchProjects failed', error);
-    throw error;
-  }
-};
+  },
 
-// Get project suggestions
-const getProjectSuggestions = async (query, limit = 5) => {
-  try {
-    const response = await api.get('/v1/project/projects/suggestion', {
+  // Get project suggestions
+  getProjectSuggestions: async (query, limit = 5) => {
+    const response = await api.get('/project/projects/suggestion', {
       params: { q: query, limit },
     });
     return response.data;
-  } catch (error) {
-    console.error('getProjectSuggestions failed', error);
-    throw error;
-  }
-};
-
-export const publicProjectsApi = {
-  getFeaturedProjects,
-  getLatestProjects,
-  getAllProjects,
-  searchProjects,
-  getProjectSuggestions,
+  },
 };

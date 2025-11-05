@@ -1,47 +1,29 @@
 import axios from 'axios';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
 
 const api = axios.create({
-  baseURL: apiUrl,
-  withCredentials: true,
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Get profile info
-const getProfileInfo = async () => {
-  try {
+export const portfolioApi = {
+  getProfileInfo: async () => {
     const response = await api.get('/v1/portfolio/profile-info');
     return response.data;
-  } catch (error) {
-    console.error('getProfileInfo failed', error);
-    throw error;
-  }
-};
-
-// Get education
-const getEducation = async () => {
-  try {
+  },
+  
+  getEducation: async () => {
     const response = await api.get('/v1/portfolio/education');
     return response.data;
-  } catch (error) {
-    console.error('getEducation failed', error);
-    throw error;
-  }
-};
-
-// Get work experience
-const getWorkExperience = async () => {
-  try {
+  },
+  
+  getWorkExperience: async () => {
     const response = await api.get('/v1/portfolio/work-experience');
     return response.data;
-  } catch (error) {
-    console.error('getWorkExperience failed', error);
-    throw error;
-  }
+  },
 };
 
-export const portfolioApi = {
-  getProfileInfo,
-  getEducation,
-  getWorkExperience,
-};
+export default api;
