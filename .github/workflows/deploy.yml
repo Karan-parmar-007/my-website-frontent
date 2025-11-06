@@ -1,73 +1,38 @@
-name: Build and Deploy Frontend
+name: Deploy Frontend (Build on Server)
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [main, master]
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
-   
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+      - name: Deploy and build on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            cd /opt/my_portfolio
 
-    - name: Install dependencies
-      run: npm ci
+            echo "🔄 Pulling latest changes..."
+            git fetch --all
+            git reset --hard origin/main
 
-    - name: Build application
-      run: npm run build
+            echo "🧱 Building frontend image with local env..."
+            docker compose build frontend
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+            echo "🚀 Restarting frontend and nginx..."
+            docker compose up -d --no-deps frontend nginx
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+            echo "🧹 Cleaning old images..."
+            docker image prune -f
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        tags: |
-          ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest
-          ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:${{ github.sha }}
-
-    - name: Deploy to server
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        script: |
-          cd /opt/my_portfolio
-         
-          echo "🔄 Pulling latest frontend image..."
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest
-         
-          echo "🔄 Updating frontend service..."
-          docker compose up -d --no-deps frontend
-         
-          echo "⏳ Waiting for frontend to be ready..."
-          sleep 15
-         
-          echo "🔄 Reloading nginx with new config..."
-          docker compose exec nginx nginx -s reload
-         
-          echo "🧹 Cleaning up old images..."
-          docker image prune -f
-         
-          echo "📊 Checking service status..."
-          docker compose ps
-         
-          echo "✅ Frontend deployed successfully!"
+            echo "✅ Deployment complete!"
