@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy and build on server
+      - name: Deploy to server and build
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -20,19 +20,19 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            cd /opt/my_portfolio
-
-            echo "🔄 Pulling latest changes..."
+            cd /opt/my_portfolio/frontend
+            echo "🔄 Pulling latest code..."
             git fetch --all
             git reset --hard origin/main
 
-            echo "🧱 Building frontend image with local env..."
+            cd /opt/my_portfolio
+            echo "🧱 Building frontend with server env..."
             docker compose build frontend
 
             echo "🚀 Restarting frontend and nginx..."
             docker compose up -d --no-deps frontend nginx
 
-            echo "🧹 Cleaning old images..."
+            echo "🧹 Cleaning up old images..."
             docker image prune -f
 
-            echo "✅ Deployment complete!"
+            echo "✅ Frontend deployed successfully!"
