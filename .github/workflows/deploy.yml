@@ -1,14 +1,46 @@
-name: Deploy Frontend (Build on Server)
+name: Build and Deploy Frontend
 
 on:
   push:
-    branches: [master]
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to server and build
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: frontend/my_website/portfolio_frontend
+          file: frontend/my_website/portfolio_frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:${{ github.sha }}
+          build-args: |
+            VITE_API_URL=${{ secrets.VITE_API_URL }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest
+          cache-to: type=inline
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -16,22 +48,32 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            set -euo pipefail
-            BRANCH='${{ github.ref_name }}'
+            set -e
 
-            # Pull latest code in the actual repo directory on the server
-            cd /opt/my_portfolio/frontend/my-website-frontent
-            git fetch origin "$BRANCH"
-            git checkout -B "$BRANCH" "origin/$BRANCH"
-
-            # Ensure env for compose so build args resolve
             cd /opt/my_portfolio
-            touch .env
-            grep -q '^VITE_API_URL=' .env || echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
 
-            # Build and restart only the needed services
-            docker compose build frontend
-            docker compose up -d --no-deps frontend nginx
+            echo "🔐 Setting image reference"
+            export FRONTEND_IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest"
 
-            # Optional cleanup
+            echo "🔄 Pulling latest frontend image..."
+            docker pull "$FRONTEND_IMAGE"
+
+            echo "🛑 Stopping and removing old frontend container..."
+            docker compose stop frontend || true
+            docker compose rm -f frontend || true
+
+            echo "🚀 Starting new frontend container..."
+            docker compose up -d frontend
+
+            echo "🔄 Restarting nginx reverse proxy..."
+            docker compose restart nginx
+
+            echo "🧹 Cleaning up old images..."
             docker image prune -f
+
+            echo "🔍 Verifying service..."
+            docker compose ps
+            sleep 5
+            curl -fsSLI https://karanparmar.in || echo "⚠️ Frontend check returned non-200 status"
+
+            echo "✅ Frontend deployed successfully!"
