@@ -7,11 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Deploy to server and build
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -20,19 +16,22 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            cd /opt/my_portfolio/frontend
-            echo "🔄 Pulling latest code..."
-            git fetch --all
-            git reset --hard origin/main
+            set -euo pipefail
+            BRANCH='${{ github.ref_name }}'
 
+            # Pull latest code in the actual repo directory on the server
+            cd /opt/my_portfolio/frontend/my-website-frontent
+            git fetch origin "$BRANCH"
+            git checkout -B "$BRANCH" "origin/$BRANCH"
+
+            # Ensure env for compose so build args resolve
             cd /opt/my_portfolio
-            echo "🧱 Building frontend with server env..."
-            docker compose build frontend
+            touch .env
+            grep -q '^VITE_API_URL=' .env || echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
 
-            echo "🚀 Restarting frontend and nginx..."
+            # Build and restart only the needed services
+            docker compose build frontend
             docker compose up -d --no-deps frontend nginx
 
-            echo "🧹 Cleaning up old images..."
+            # Optional cleanup
             docker image prune -f
-
-            echo "✅ Frontend deployed successfully!"
