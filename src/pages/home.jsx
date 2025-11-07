@@ -217,7 +217,7 @@ export default function Home() {
                 <div className="max-w-[1000px] mx-auto w-full">
                     {/* Hero Section */}
                     <section className="min-h-[calc(100vh-8rem)] flex flex-col justify-center">
-                        <p className="text-[#64ffda] mb-4 text-base">Hi, my name is</p>
+                        <p className="text-[#64ffda] mb-4 text-base">Hi, my name is Karan</p>
                         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-[#ccd6f6] mb-4 break-words">
                             {profileData?.name || 'Karan Parmar'}.
                         </h1>
