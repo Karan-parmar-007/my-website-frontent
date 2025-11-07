@@ -24,8 +24,8 @@ jobs:
       - name: Build and push frontend image
         uses: docker/build-push-action@v5
         with:
-          context: frontend/my_website/portfolio_frontend
-          file: frontend/my_website/portfolio_frontend/Dockerfile
+          context: .
+          file: ./Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest
@@ -49,11 +49,10 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             set -e
-
             cd /opt/my_portfolio
 
-            echo "🔐 Setting image reference"
             export FRONTEND_IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/portfolio-frontend:latest"
+            export VITE_API_URL="${{ secrets.VITE_API_URL }}"
 
             echo "🔄 Pulling latest frontend image..."
             docker pull "$FRONTEND_IMAGE"
