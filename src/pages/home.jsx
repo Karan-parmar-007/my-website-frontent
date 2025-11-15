@@ -389,9 +389,10 @@ export default function Home() {
                                                         </div>
 
                                                         {/* Description */}
+
                                                         <p className="text-[#8892b0] leading-relaxed">
-                                                            {project.long_description}
-                                                        </p>
+                                                            {project.short_description || project.long_description}
+                                                        </p>
 
                                                         {/* Skills */}
                                                         <div className="flex flex-wrap gap-2">
