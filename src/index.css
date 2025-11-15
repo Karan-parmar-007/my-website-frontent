@@ -1,9 +1,40 @@
+/* -----------------------------------------------------
+   Tailwind Base
+----------------------------------------------------- */
 @import "tailwindcss";
-@import "tw-animate-css";
 
+/* -----------------------------------------------------
+   Dark mode variant (needed for shadcn)
+----------------------------------------------------- */
 @custom-variant dark (&:is(.dark *));
 
-/* Fix Chrome autofill text color */
+/* -----------------------------------------------------
+   FIX: Remove unwanted dotted diagonal patterns
+----------------------------------------------------- */
+*::before,
+*::after {
+  background-image: none !important;
+  box-shadow: none !important;
+  border-image: none !important;
+}
+
+/* -----------------------------------------------------
+   FIX: Add a new clean background layer BEHIND everything
+   (this covers the broken OG background but does NOT
+    affect layout or z-index of your content)
+----------------------------------------------------- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: #0a192f; /* your main site background */
+  z-index: -1; /* behind everything */
+  pointer-events: none;
+}
+
+/* -----------------------------------------------------
+   Autofill Fix (Chrome yellow background & text issues)
+----------------------------------------------------- */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -11,7 +42,13 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: #ccd6f6 !important;
   -webkit-box-shadow: 0 0 0px 1000px #0a192f inset !important;
   box-shadow: 0 0 0px 1000px #0a192f inset !important;
-  transition: background-color 5000s ease-in-out 0s;
+  transition: background-color 9999s ease-in-out 0s;
 }
 
-
+/* -----------------------------------------------------
+   Basic Body Styling (safe)
+----------------------------------------------------- */
+body {
+  background-color: #0a192f;
+  color: #ccd6f6;
+}
