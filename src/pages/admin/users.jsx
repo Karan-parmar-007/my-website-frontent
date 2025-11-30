@@ -485,9 +485,9 @@ export default function UsersPage() {
       <SidebarInset className="flex-1 flex flex-col min-h-screen">
         <header className="flex h-14 shrink-0 items-center gap-4 border-b border-[#172a45] bg-[#112240] px-4">
           <SidebarTrigger />
-          <div className="flex flex-1 items-center justify-between">
+          <div className="flex flex-1 items-center justify-between min-w-0">
             <h1 className="text-lg font-semibold text-[#ccd6f6]">Users</h1>
-            <div className="text-sm text-[#8892b0]">
+            <div className="hidden sm:block text-sm text-[#8892b0]">
               Welcome, <span className="text-[#64ffda]">{user?.preferred_name || 'Admin'}</span>
             </div>
           </div>
@@ -577,8 +577,74 @@ export default function UsersPage() {
               </div>
             )}
 
-            {/* Users Table */}
-            <div className="rounded-lg border border-[#172a45] bg-[#112240] overflow-hidden">
+            {/* Users List - Mobile Cards */}
+            <div className="block md:hidden space-y-4">
+              {loading ? (
+                <div className="text-center py-8">
+                  <div className="text-[#64ffda]">Loading...</div>
+                </div>
+              ) : users.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-[#8892b0]">
+                    {isSearching ? 'No users found matching your search.' : 'No users found.'}
+                  </div>
+                </div>
+              ) : (
+                users.map((u) => (
+                  <div
+                    key={u.id}
+                    className="rounded-lg border border-[#172a45] bg-[#112240] p-4 space-y-3"
+                  >
+                    {/* User Header */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-semibold text-[#ccd6f6] truncate">{u.preferred_name}</h3>
+                        <p className="text-sm text-[#8892b0] truncate">{u.email}</p>
+                      </div>
+                      <div className="flex items-center gap-1 ml-2">
+                        <button
+                          onClick={() => openEditUser(u)}
+                          className="p-2 text-[#64ffda] hover:bg-[#64ffda]/10 rounded transition-colors"
+                          title="Edit user"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => openResetPassword(u)}
+                          className="p-2 text-yellow-400 hover:bg-yellow-400/10 rounded transition-colors"
+                          title="Reset password"
+                        >
+                          <KeyRound className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(u.id)}
+                          className="p-2 text-red-400 hover:bg-red-400/10 rounded transition-colors"
+                          title="Delete user"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    {/* User Details */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center rounded-full bg-[#64ffda]/20 px-2.5 py-0.5 text-xs font-medium text-[#64ffda]">
+                        {u.role?.name || 'User'}
+                      </span>
+                      {getStatusBadge(u.email_verified)}
+                    </div>
+                    
+                    {/* Joined Date */}
+                    <div className="text-xs text-[#8892b0]">
+                      Joined: {formatDate(u.created_at)}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Users Table - Desktop */}
+            <div className="hidden md:block rounded-lg border border-[#172a45] bg-[#112240] overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
