@@ -26,7 +26,6 @@ const Navbar = () => {
       ]
     : [
         { text: 'Home', href: '/' },
-        { number: '01', text: 'Projects', href: '/projects' },
       ];
 
   // Helper function to determine if a link is active
@@ -205,11 +204,11 @@ const Navbar = () => {
                     <button
                       onClick={() => {
                         setIsUserMenuOpen(false);
-                        navigate('/account');
+                        navigate('/my-account');
                       }}
                       className="w-full text-left px-4 py-3 text-sm text-[#ccd6f6] hover:text-[#64ffda] transition-colors"
                     >
-                      Account
+                      My Account
                     </button>
                     <button
                       onClick={handleSignOut}
@@ -287,12 +286,12 @@ const Navbar = () => {
                   <Button
                     onClick={() => {
                       setIsMenuOpen(false);
-                      navigate('/account');
+                      navigate('/my-account');
                     }}
                     variant="outline"
                     className="w-full px-4 h-10"
                   >
-                    Account
+                    My Account
                   </Button>
                 </li>
                 {profileData?.resume_file_base64 && (

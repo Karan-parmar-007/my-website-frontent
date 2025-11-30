@@ -207,11 +207,17 @@ const handleSubmit = async (e) => {
                 {isSubmitting ? 'Creating Account...' : 'Sign Up'}
               </Button>
             </form>
-            <div className="mt-4 md:mt-5 text-center">
+            <div className="mt-4 md:mt-5 text-center space-y-2">
               <p className="text-[#8892b0] text-xs md:text-sm">
                 Already have an account?{' '}
                 <Link to="/login" className="text-[#64ffda] hover:text-[#64ffda]/80 font-medium transition-colors">
                   Log in
+                </Link>
+              </p>
+              <p className="text-[#8892b0] text-xs md:text-sm">
+                Forgot your password?{' '}
+                <Link to="/forgot-password" className="text-[#64ffda] hover:text-[#64ffda]/80 font-medium transition-colors">
+                  Reset it here
                 </Link>
               </p>
             </div>

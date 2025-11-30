@@ -20,6 +20,10 @@ import AccessDenied from '@/pages/AccessDenied';
 import AlreadyLoggedIn from '@/pages/AlreadyLoggedIn';
 import RolesAndPermissions from './pages/admin/RolesAndPermissions';
 import UsersPage from '@/pages/admin/users';
+import ForgotPassword from '@/pages/ForgotPassword';
+import VerifyOTP from '@/pages/VerifyOTP';
+import MyAccount from '@/pages/MyAccount';
+import { ToastProvider } from '@/components/ui/toast';
 
 function App() {
   const [showContent, setShowContent] = useState(false);
@@ -27,7 +31,8 @@ function App() {
   return (
     <AuthProvider>
       <RoleProvider>
-        <Router>
+        <ToastProvider>
+          <Router>
           <Loader onLoadComplete={() => setShowContent(true)} />
           <motion.div
             initial={{ opacity: 0 }}
@@ -52,6 +57,30 @@ function App() {
                   <PublicOnlyRoute>
                     <Signup />
                   </PublicOnlyRoute>
+                } 
+              />
+              <Route 
+                path="/forgot-password" 
+                element={
+                  <PublicOnlyRoute>
+                    <ForgotPassword />
+                  </PublicOnlyRoute>
+                } 
+              />
+              <Route 
+                path="/verify-otp" 
+                element={
+                  <PublicOnlyRoute>
+                    <VerifyOTP />
+                  </PublicOnlyRoute>
+                } 
+              />
+              <Route 
+                path="/my-account" 
+                element={
+                  <PrivateRoute>
+                    <MyAccount />
+                  </PrivateRoute>
                 } 
               />
               
@@ -146,6 +175,7 @@ function App() {
             </Routes>
           </motion.div>
         </Router>
+        </ToastProvider>
       </RoleProvider>
     </AuthProvider>
   );

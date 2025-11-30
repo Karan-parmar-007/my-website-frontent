@@ -162,3 +162,115 @@ export const validateUserRole = async (requiredRoles) => {
 
   return response.json();
 };
+
+// Forgot password - sends OTP
+export const forgotPassword = async (email) => {
+  const response = await fetch(`${API_V1_BASE_URL}/user/password/forgot`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    let errorDetail = 'Failed to send OTP';
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
+  }
+
+  return response.json();
+};
+
+// Verify OTP and reset password
+export const verifyOTPAndReset = async (otp, newPassword) => {
+  const response = await fetch(`${API_V1_BASE_URL}/user/password/verify-otp`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ otp, new_password: newPassword }),
+  });
+
+  if (!response.ok) {
+    let errorDetail = 'Failed to verify OTP';
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
+  }
+
+  return response.json();
+};
+
+// Change password (logged-in user)
+export const changePassword = async (currentPassword, newPassword, confirmPassword) => {
+  const response = await fetch(`${API_V1_BASE_URL}/user/password/change`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      current_password: currentPassword, 
+      new_password: newPassword,
+      confirm_password: confirmPassword
+    }),
+  });
+
+  if (!response.ok) {
+    let errorDetail = 'Failed to change password';
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
+  }
+
+  return response.json();
+};
+
+// Update current user (basic info only - no password)
+export const updateCurrentUser = async (userData) => {
+  const response = await fetch(`${API_V1_BASE_URL}/user/me`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData),
+  });
+
+  if (!response.ok) {
+    let errorDetail = 'Failed to update user';
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
+  }
+
+  return response.json();
+};
+
+// Admin reset user password
+export const adminResetPassword = async (userId, newPassword) => {
+  const response = await fetch(`${API_V1_BASE_URL}/user/password/admin-reset`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      user_id: userId, 
+      new_password: newPassword 
+    }),
+  });
+
+  if (!response.ok) {
+    let errorDetail = 'Failed to reset password';
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
+  }
+
+  return response.json();
+};

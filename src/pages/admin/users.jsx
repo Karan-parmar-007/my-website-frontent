@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, FolderKanban, Users, UsersIcon, Briefcase, LogOut, Trash2, Shield, Plus, Search, Pencil, X } from 'lucide-react';
+import { Home, FolderKanban, Users, UsersIcon, Briefcase, LogOut, Trash2, Shield, Plus, Search, Pencil, X, KeyRound } from 'lucide-react';
+import SimpleLoader from '@/components/SimpleLoader';
+import { useToast } from '@/components/ui/toast';
 import {
   Sidebar,
   SidebarContent,
@@ -40,6 +42,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { usersApi } from '@/lib/users_apis';
 import { rolesApi } from '@/lib/roles_apis';
+import { adminResetPassword } from '@/lib/user_apis';
 
 const menuItems = [
   { title: 'Dashboard', url: '/admin/dashboard', icon: Home },
@@ -133,6 +136,7 @@ function AppSidebar() {
 
 export default function UsersPage() {
   const { user } = useAuth();
+  const { addToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
@@ -152,6 +156,11 @@ export default function UsersPage() {
     role_id: '',
     email_verified: false,
   });
+  const [resetPasswordDialog, setResetPasswordDialog] = useState(false);
+  const [resetPasswordUser, setResetPasswordUser] = useState(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   const searchTimeoutRef = useRef(null);
   const suggestionTimeoutRef = useRef(null);
@@ -276,20 +285,37 @@ export default function UsersPage() {
     e.preventDefault();
     try {
       if (editingUser) {
-        const updateData = { ...userForm };
-        if (!updateData.password) {
-          delete updateData.password;
-        }
+        // For editing, exclude password field entirely
+        const updateData = {
+          preferred_name: userForm.preferred_name,
+          email: userForm.email,
+          role_id: userForm.role_id,
+          email_verified: userForm.email_verified,
+        };
         await usersApi.updateUser(editingUser.id, updateData);
+        addToast({
+          title: 'Success',
+          description: 'User updated successfully.',
+          variant: 'success',
+        });
       } else {
         await usersApi.createUser(userForm);
+        addToast({
+          title: 'Success',
+          description: 'User created successfully.',
+          variant: 'success',
+        });
       }
       await fetchData();
       setUserDialog(false);
       resetForm();
     } catch (error) {
       console.error('Failed to save user:', error);
-      alert(error.message || 'Failed to save user');
+      addToast({
+        title: 'Error',
+        description: error.message || 'Failed to save user.',
+        variant: 'error',
+      });
     }
   };
 
@@ -325,6 +351,59 @@ export default function UsersPage() {
       role_id: '',
       email_verified: false,
     });
+  };
+
+  const openResetPassword = (user) => {
+    setResetPasswordUser(user);
+    setNewPassword('');
+    setConfirmNewPassword('');
+    setResetPasswordDialog(true);
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+
+    if (newPassword !== confirmNewPassword) {
+      addToast({
+        title: 'Error',
+        description: 'Passwords do not match.',
+        variant: 'error',
+      });
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      addToast({
+        title: 'Error',
+        description: 'Password must be at least 8 characters long.',
+        variant: 'error',
+      });
+      return;
+    }
+
+    setResettingPassword(true);
+
+    try {
+      await adminResetPassword(resetPasswordUser.id, newPassword);
+      addToast({
+        title: 'Success',
+        description: `Password reset successfully for ${resetPasswordUser.email}.`,
+        variant: 'success',
+      });
+      setResetPasswordDialog(false);
+      setResetPasswordUser(null);
+      setNewPassword('');
+      setConfirmNewPassword('');
+    } catch (error) {
+      console.error('Failed to reset password:', error);
+      addToast({
+        title: 'Error',
+        description: error.message || 'Failed to reset password.',
+        variant: 'error',
+      });
+    } finally {
+      setResettingPassword(false);
+    }
   };
 
   const getStatusBadge = (isVerified) => {
@@ -563,6 +642,13 @@ export default function UsersPage() {
                                 <Pencil className="h-4 w-4" />
                               </button>
                               <button
+                                onClick={() => openResetPassword(u)}
+                                className="p-2 text-yellow-400 hover:bg-yellow-400/10 rounded transition-colors"
+                                title="Reset password"
+                              >
+                                <KeyRound className="h-4 w-4" />
+                              </button>
+                              <button
                                 onClick={() => handleDeleteUser(u.id)}
                                 className="p-2 text-red-400 hover:bg-red-400/10 rounded transition-colors"
                                 title="Delete user"
@@ -635,19 +721,26 @@ export default function UsersPage() {
                   className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
                 />
               </div>
-              <div>
-                <Label htmlFor="user-password" className="text-[#ccd6f6]">
-                  Password {editingUser && <span className="text-[#8892b0]">(leave blank to keep current)</span>}
-                </Label>
-                <Input
-                  id="user-password"
-                  type="password"
-                  value={userForm.password}
-                  onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-                  required={!editingUser}
-                  className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
-                />
-              </div>
+              {!editingUser && (
+                <div>
+                  <Label htmlFor="user-password" className="text-[#ccd6f6]">
+                    Password
+                  </Label>
+                  <Input
+                    id="user-password"
+                    type="password"
+                    value={userForm.password}
+                    onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                    required
+                    className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
+                  />
+                </div>
+              )}
+              {editingUser && (
+                <div className="p-3 bg-blue-500/10 border border-blue-500/50 rounded text-blue-400 text-sm">
+                  To reset this user's password, use the "Reset Password" button in the user list.
+                </div>
+              )}
               <div>
                 <Label htmlFor="user-role" className="text-[#ccd6f6]">Role</Label>
                 <select
@@ -695,6 +788,77 @@ export default function UsersPage() {
                 className="border-[#64ffda] text-[#64ffda] hover:bg-[#64ffda]/10"
               >
                 {editingUser ? 'Update' : 'Create'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={resetPasswordDialog} onOpenChange={setResetPasswordDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-[#ccd6f6]">Reset User Password</DialogTitle>
+            <DialogDescription className="text-[#8892b0]">
+              Reset password for {resetPasswordUser?.email}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleResetPassword}>
+            <div className="space-y-4">
+              <div className="p-3 bg-[#0a192f] rounded-lg border border-[#172a45]">
+                <p className="text-xs text-[#8892b0] mb-1">User</p>
+                <p className="text-sm font-medium text-[#ccd6f6]">{resetPasswordUser?.preferred_name}</p>
+                <p className="text-xs text-[#8892b0]">{resetPasswordUser?.email}</p>
+              </div>
+              <div>
+                <Label htmlFor="new-password" className="text-[#ccd6f6]">New Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  required
+                  disabled={resettingPassword}
+                  className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
+                />
+              </div>
+              <div>
+                <Label htmlFor="confirm-new-password" className="text-[#ccd6f6]">Confirm Password</Label>
+                <Input
+                  id="confirm-new-password"
+                  type="password"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  required
+                  disabled={resettingPassword}
+                  className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
+                />
+              </div>
+            </div>
+            <DialogFooter className="mt-4">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setResetPasswordDialog(false);
+                  setResetPasswordUser(null);
+                  setNewPassword('');
+                  setConfirmNewPassword('');
+                }}
+                disabled={resettingPassword}
+                className="text-[#8892b0] hover:text-[#ccd6f6] hover:bg-[#172a45]"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                variant="outline"
+                disabled={resettingPassword}
+                className="border-[#64ffda] text-[#64ffda] hover:bg-[#64ffda]/10"
+              >
+                {resettingPassword ? <SimpleLoader className="justify-center" /> : 'Reset Password'}
               </Button>
             </DialogFooter>
           </form>
