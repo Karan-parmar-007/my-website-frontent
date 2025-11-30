@@ -34,12 +34,12 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const response = await forgotPassword(email);
+      const response = await forgotPassword(email.toLowerCase());
       setSuccessMessage(response.message || 'OTP sent successfully! Check your email.');
       
       // Navigate to OTP verification page after 2 seconds
       setTimeout(() => {
-        navigate('/verify-otp', { state: { email } });
+        navigate('/verify-otp', { state: { email: email.toLowerCase() } });
       }, 2000);
     } catch (err) {
       setError(err.message || 'Failed to send OTP. Please try again.');

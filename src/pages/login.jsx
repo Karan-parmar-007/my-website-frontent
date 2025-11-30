@@ -41,7 +41,7 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      const result = await login({ email, password });
+      const result = await login({ email: email.toLowerCase(), password });
       if (result.success) {
         navigate('/', { replace: true });
         checkAuth(); // Update user state after navigation

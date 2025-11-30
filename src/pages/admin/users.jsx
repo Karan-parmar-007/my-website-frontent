@@ -288,7 +288,7 @@ export default function UsersPage() {
         // For editing, exclude password field entirely
         const updateData = {
           preferred_name: userForm.preferred_name,
-          email: userForm.email,
+          email: userForm.email.toLowerCase(),
           role_id: userForm.role_id,
           email_verified: userForm.email_verified,
         };
@@ -299,7 +299,11 @@ export default function UsersPage() {
           variant: 'success',
         });
       } else {
-        await usersApi.createUser(userForm);
+        const createData = {
+          ...userForm,
+          email: userForm.email.toLowerCase()
+        };
+        await usersApi.createUser(createData);
         addToast({
           title: 'Success',
           description: 'User created successfully.',

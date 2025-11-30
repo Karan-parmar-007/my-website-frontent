@@ -50,7 +50,10 @@ const MyAccount = () => {
     setLoadingInfo(true);
 
     try {
-      await updateCurrentUser(userInfo);
+      await updateCurrentUser({
+        preferred_name: userInfo.preferred_name,
+        email: userInfo.email.toLowerCase()
+      });
       await checkAuth(); // Refresh user data
       addToast({
         title: 'Success',

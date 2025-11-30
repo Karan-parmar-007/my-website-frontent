@@ -93,7 +93,7 @@ function App() {
                 path="/admin" 
                 element={
                   <PrivateRoute>
-                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                    <RoleProtectedRoute requiredRoles={['super_admin', 'admin_family', 'admin']}>
                       <AdminDashboard />
                     </RoleProtectedRoute>
                   </PrivateRoute>
@@ -103,7 +103,7 @@ function App() {
                 path="/admin/dashboard" 
                 element={
                   <PrivateRoute>
-                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                    <RoleProtectedRoute requiredRoles={['super_admin', 'admin_family', 'admin']}>
                       <AdminDashboard />
                     </RoleProtectedRoute>
                   </PrivateRoute>
@@ -113,7 +113,7 @@ function App() {
                 path="/admin/portfolio" 
                 element={
                   <PrivateRoute>
-                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                    <RoleProtectedRoute requiredRoles={['super_admin', 'admin_family', 'admin']}>
                       <Portfolio />
                     </RoleProtectedRoute>
                   </PrivateRoute>
@@ -123,7 +123,7 @@ function App() {
                 path="/admin/projects" 
                 element={
                   <PrivateRoute>
-                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                    <RoleProtectedRoute requiredRoles={['super_admin', 'admin_family', 'admin']}>
                       <AdminProjectsPage />
                     </RoleProtectedRoute>
                   </PrivateRoute>
@@ -133,7 +133,7 @@ function App() {
                 path="/admin/project-access-levels" 
                 element={
                   <PrivateRoute>
-                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                    <RoleProtectedRoute requiredRoles={['super_admin', 'admin_family', 'admin']}>
                       <ProjectAccessLevelPage />
                     </RoleProtectedRoute>
                   </PrivateRoute>
@@ -143,7 +143,7 @@ function App() {
                 path="/admin/project-membership" 
                 element={
                   <PrivateRoute>
-                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                    <RoleProtectedRoute requiredRoles={['super_admin', 'admin_family', 'admin']}>
                       <ProjectMembershipPage />
                     </RoleProtectedRoute>
                   </PrivateRoute>
@@ -153,7 +153,7 @@ function App() {
                 path="/admin/roles" 
                 element={
                   <PrivateRoute>
-                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                    <RoleProtectedRoute requiredRoles={['super_admin', 'admin_family', 'admin']}>
                       <RolesAndPermissions />
                     </RoleProtectedRoute>
                   </PrivateRoute>
@@ -163,7 +163,7 @@ function App() {
                 path="/admin/users" 
                 element={
                   <PrivateRoute>
-                    <RoleProtectedRoute requiredRoles={['super_admin']}>
+                    <RoleProtectedRoute requiredRoles={['super_admin', 'admin_family', 'admin']}>
                       <UsersPage />
                     </RoleProtectedRoute>
                   </PrivateRoute>

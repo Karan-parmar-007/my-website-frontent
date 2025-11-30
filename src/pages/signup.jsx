@@ -46,7 +46,7 @@ const handleSubmit = async (e) => {
 
     setIsSubmitting(true);
     try {
-      const result = await register({ name, email, password });
+      const result = await register({ name, email: email.toLowerCase(), password });
       if (result.success) {
         navigate('/', { replace: true });
         checkAuth(); // Update user state after navigation
