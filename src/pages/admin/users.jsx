@@ -384,7 +384,7 @@ export default function UsersPage() {
     setResettingPassword(true);
 
     try {
-      await adminResetPassword(resetPasswordUser.id, newPassword);
+      await adminResetPassword(resetPasswordUser.id, resetPasswordUser.email, newPassword);
       addToast({
         title: 'Success',
         description: `Password reset successfully for ${resetPasswordUser.email}.`,

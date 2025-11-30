@@ -252,13 +252,14 @@ export const updateCurrentUser = async (userData) => {
 };
 
 // Admin reset user password
-export const adminResetPassword = async (userId, newPassword) => {
+export const adminResetPassword = async (userId, email, newPassword) => {
   const response = await fetch(`${API_V1_BASE_URL}/user/password/admin-reset`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 
-      user_id: userId, 
+      user_id: userId,
+      email: email,
       new_password: newPassword 
     }),
   });
