@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, FolderKanban, Users, UsersIcon, Briefcase, LogOut, Trash2, Shield, Plus, Search, Pencil, X, KeyRound } from 'lucide-react';
+import { Home, FolderKanban, Users, UsersIcon, Briefcase, LogOut, Trash2, Shield, Plus, Search, Pencil, X, KeyRound, Eye, EyeOff } from 'lucide-react';
 import SimpleLoader from '@/components/SimpleLoader';
 import { useToast } from '@/components/ui/toast';
 import {
@@ -161,6 +161,9 @@ export default function UsersPage() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [resettingPassword, setResettingPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const searchTimeoutRef = useRef(null);
   const suggestionTimeoutRef = useRef(null);
@@ -796,14 +799,23 @@ export default function UsersPage() {
                   <Label htmlFor="user-password" className="text-[#ccd6f6]">
                     Password
                   </Label>
-                  <Input
-                    id="user-password"
-                    type="password"
-                    value={userForm.password}
-                    onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-                    required
-                    className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="user-password"
+                      type={showPassword ? "text" : "password"}
+                      value={userForm.password}
+                      onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                      required
+                      className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6] pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8892b0] hover:text-[#ccd6f6] transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
               )}
               {editingUser && (
@@ -882,29 +894,49 @@ export default function UsersPage() {
               </div>
               <div>
                 <Label htmlFor="new-password" className="text-[#ccd6f6]">New Password</Label>
-                <Input
-                  id="new-password"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
-                  required
-                  disabled={resettingPassword}
-                  className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
-                />
+                <div className="relative">
+                  <Input
+                    id="new-password"
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter new password"
+                    required
+                    disabled={resettingPassword}
+                    className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6] pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    disabled={resettingPassword}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8892b0] hover:text-[#ccd6f6] transition-colors disabled:opacity-50"
+                  >
+                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
               <div>
                 <Label htmlFor="confirm-new-password" className="text-[#ccd6f6]">Confirm Password</Label>
-                <Input
-                  id="confirm-new-password"
-                  type="password"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  placeholder="Confirm new password"
-                  required
-                  disabled={resettingPassword}
-                  className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
-                />
+                <div className="relative">
+                  <Input
+                    id="confirm-new-password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    placeholder="Confirm new password"
+                    required
+                    disabled={resettingPassword}
+                    className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6] pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    disabled={resettingPassword}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8892b0] hover:text-[#ccd6f6] transition-colors disabled:opacity-50"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
             </div>
             <DialogFooter className="mt-4">

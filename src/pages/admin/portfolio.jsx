@@ -226,11 +226,12 @@ export default function Portfolio() {
   const handleEducationSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
+    const endYearValue = formData.get('end_year');
     const data = {
       school: formData.get('school'),
       degree: formData.get('degree'),
       start_year: parseInt(formData.get('start_year')),
-      end_year: parseInt(formData.get('end_year')),
+      end_year: endYearValue && endYearValue.trim() !== '' ? parseInt(endYearValue) : null,
       Score: formData.get('Score') ? parseFloat(formData.get('Score')) : null,
       description: formData.get('description') || null,
       sequence: parseInt(formData.get('sequence')),
@@ -258,11 +259,12 @@ export default function Portfolio() {
   const handleWorkSubmit = async (e) => {
     e.preventDefault();
     const form = new FormData(e.target);
+    const endDateValue = form.get('end_date');
     const data = {
       company: form.get('company'),
       position: form.get('position'),
       start_date: form.get('start_date'),
-      end_date: form.get('end_date') || null,
+      end_date: endDateValue && endDateValue.trim() !== '' ? endDateValue : null,
       description: workDescriptions.filter(desc => desc.trim() !== ''),
       sequence: parseInt(form.get('sequence')),
     };
@@ -779,13 +781,13 @@ export default function Portfolio() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-[#ccd6f6]" htmlFor="end_year">End Year</Label>
+                <Label className="text-[#ccd6f6]" htmlFor="end_year">End Year (Optional)</Label>
                 <Input
                   id="end_year"
                   name="end_year"
                   type="number"
                   defaultValue={currentEducation?.end_year}
-                  required
+                  placeholder="Leave empty for current"
                   className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
                 />
               </div>
@@ -868,7 +870,8 @@ export default function Portfolio() {
                   type="date"
                   defaultValue={currentWork?.start_date}
                   required
-                  className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
+                  className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6] [color-scheme:dark]"
+                  style={{colorScheme: 'dark'}}
                 />
               </div>
               <div>
@@ -878,7 +881,8 @@ export default function Portfolio() {
                   name="end_date"
                   type="date"
                   defaultValue={currentWork?.end_date}
-                  className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
+                  className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6] [color-scheme:dark]"
+                  style={{colorScheme: 'dark'}}
                   placeholder="Leave empty for current"
                 />
               </div>

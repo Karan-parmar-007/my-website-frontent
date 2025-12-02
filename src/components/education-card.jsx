@@ -22,7 +22,7 @@ const EducationCard = ({ education }) => {
             </div>
             <div className="text-right">
               <p className="text-[#a8b2d1] text-sm">
-                {education.start_year} - {education.end_year}
+                {education.start_year} - {education.end_year ? education.end_year : 'Current'}
               </p>
               {education.Score && (
                 <p className="text-[#64ffda] text-sm font-medium mt-1">
