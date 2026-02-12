@@ -39,17 +39,9 @@ const processQueue = (error, token = null) => {
 // Request interceptor - add CSRF token from cookie if available
 apiClient.interceptors.request.use(
   (config) => {
-    // Debug: Trace CSRF token extraction
-    console.group('CRSF Token Debug');
-    console.log('Document Cookies:', document.cookie);
-    
     // Read CSRF token from cookie using robust Regex
     const match = document.cookie.match(/(^|;\s*)csrf_token=([^;]+)/);
-    console.log('Regex Match Result:', match);
-
     const csrfToken = match ? match[2] : null;
-    console.log('Extracted Token:', csrfToken);
-    console.groupEnd();
 
     if (csrfToken) {
       config.headers['X-CSRF-Token'] = csrfToken;
@@ -129,15 +121,8 @@ export const apiClientFormData = axios.create({
 // Add same interceptors to form data client
 apiClientFormData.interceptors.request.use(
   (config) => {
-    console.group('CRSF Token Debug (FormData)');
-    console.log('Document Cookies:', document.cookie);
-    
     const match = document.cookie.match(/(^|;\s*)csrf_token=([^;]+)/);
-    console.log('Regex Match Result:', match);
-
     const csrfToken = match ? match[2] : null;
-    console.log('Extracted Token:', csrfToken);
-    console.groupEnd();
 
     if (csrfToken) {
       config.headers['X-CSRF-Token'] = csrfToken;
