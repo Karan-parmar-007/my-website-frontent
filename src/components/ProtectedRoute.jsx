@@ -20,7 +20,7 @@ export const PublicOnlyRoute = ({ children }) => {
     const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
     if (isAuthPage) {
-      return <Navigate to="/already-logged-in" replace />;
+      return <Navigate to="/" replace />;
     }
 
     // Otherwise redirect to home

@@ -15,7 +15,7 @@ import SimpleNavbar from '@/components/simple-navbar';
 const Signup = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { register, checkAuth } = useAuth();
+  const { register, setUserAfterNav } = useAuth();
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -48,8 +48,13 @@ const handleSubmit = async (e) => {
     try {
       const result = await register({ name, email: email.toLowerCase(), password });
       if (result.success) {
+        // Navigate FIRST, then set user state to avoid PublicOnlyRoute redirect
         navigate('/', { replace: true });
-        checkAuth(); // Update user state after navigation
+        setTimeout(() => {
+          if (result.user) {
+            setUserAfterNav(result.user);
+          }
+        }, 0);
       } else {
         setError(result.message || 'Registration failed');
       }

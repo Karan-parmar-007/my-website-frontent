@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { projectsApi } from '@/lib/projects_apis';
 import { rolesApi } from '@/lib/roles_apis';
 import { accessLevelsApi } from '@/lib/access_levels_apis';
+import { useSkills, useSkillCategories } from '@/lib/queries/usePortfolioQueries';
 import {
   SidebarProvider,
   Sidebar,
@@ -41,7 +42,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
-import { Home, UsersIcon, FolderKanban, Users, Briefcase, Shield, LogOut, Plus, Pencil, Trash2, Search, X, ExternalLink } from 'lucide-react';
+import { Home, UsersIcon, FolderKanban, Users, Briefcase, Shield, LogOut, Plus, Pencil, Trash2, Search, X, ExternalLink, ArrowUpDown } from 'lucide-react';
+import { SkillSelector } from '@/components/admin/SkillSelector';
+import { HierarchicalSkillSelector } from '@/components/HierarchicalSkillSelector';
 
 const menuItems = [
   { title: 'Dashboard', url: '/admin/dashboard', icon: Home },
@@ -142,6 +145,8 @@ export default function ProjectsPage() {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedSkillFilters, setSelectedSkillFilters] = useState([]);
+  const [sortByDate, setSortByDate] = useState(null); // null | 'asc' | 'desc'
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(20);
   const [hasMorePages, setHasMorePages] = useState(false);
@@ -153,28 +158,47 @@ export default function ProjectsPage() {
     name: '',
     short_description: '',
     long_description: '',
-    skills_used: [],
+    skillIds: [],
     github_link_backend: '',
     github_link_frontend: '',
     docker_image_link_backend: '',
     docker_image_link_frontend: '',
-    contributors: {},  // Changed to object
+    contributors: {},
     is_interesting_project: false,
     is_live: false,
     access_level_id: '',
     ngrok_url: '',
   });
-  const [currentSkill, setCurrentSkill] = useState('');
-  const [currentContributorName, setCurrentContributorName] = useState('');  // Changed
-  const [currentContributorUsername, setCurrentContributorUsername] = useState('');  // Added
+  const [currentContributorName, setCurrentContributorName] = useState('');
+  const [currentContributorUsername, setCurrentContributorUsername] = useState('');
+
+  // Fetch available skills and categories for the skill picker
+  const { data: availableSkills = [] } = useSkills();
+  const { data: skillCategories = [] } = useSkillCategories();
+
+  // Group skills by category for the picker dropdown
+  const skillsByCategory = useMemo(() => {
+    const grouped = {};
+    for (const cat of skillCategories) {
+      grouped[cat.id] = {
+        name: cat.name,
+        skills: availableSkills.filter(s => s.category_id === cat.id),
+      };
+    }
+    // Uncategorized skills
+    const uncategorized = availableSkills.filter(s => !s.category_id);
+    if (uncategorized.length > 0) {
+      grouped['uncategorized'] = { name: 'Uncategorized', skills: uncategorized };
+    }
+    return grouped;
+  }, [availableSkills, skillCategories]);
 
   const searchTimeoutRef = useRef(null);
-  const suggestionTimeoutRef = useRef(null);
   const searchInputRef = useRef(null);
 
   useEffect(() => {
     fetchData();
-  }, [currentPage]);
+  }, [currentPage, selectedSkillFilters, sortByDate]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -190,9 +214,16 @@ export default function ProjectsPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      const isFiltering = isSearching || selectedSkillFilters.length > 0 || sortByDate;
+
       const [projectsData, accessLevelsData] = await Promise.all([
-        isSearching && searchQuery
-          ? projectsApi.searchProjects(searchQuery, currentPage, pageSize)
+        isFiltering
+          ? projectsApi.searchProjects(searchQuery, {
+              page: currentPage,
+              size: pageSize,
+              skillIds: selectedSkillFilters,
+              sortByDate: sortByDate,
+            })
           : projectsApi.getAllProjects(currentPage, pageSize),
         accessLevelsApi.getAllAccessLevels(),
       ]);
@@ -255,12 +286,16 @@ export default function ProjectsPage() {
     setShowSuggestions(false);
     setIsSearching(true);
     setCurrentPage(1);
-    
-    // Trigger search immediately with the suggestion
+
     setTimeout(async () => {
       try {
         setLoading(true);
-        const projectsData = await projectsApi.searchProjects(suggestion, 1, pageSize);
+        const projectsData = await projectsApi.searchProjects(suggestion, {
+          page: 1,
+          size: pageSize,
+          skillIds: selectedSkillFilters,
+          sortByDate: sortByDate,
+        });
         setProjects(projectsData);
         setHasMorePages(projectsData.length === pageSize);
       } catch (error) {
@@ -276,9 +311,10 @@ export default function ProjectsPage() {
     setIsSearching(false);
     setSuggestions([]);
     setShowSuggestions(false);
+    setSelectedSkillFilters([]);
+    setSortByDate(null);
     setCurrentPage(1);
-    
-    // Fetch all projects after clearing search state
+
     setTimeout(async () => {
       try {
         setLoading(true);
@@ -312,12 +348,9 @@ export default function ProjectsPage() {
       
       // Append all form fields
       Object.keys(projectForm).forEach((key) => {
-        if (key === 'skills_used') {
-          // Don't append if empty
-          if (projectForm[key].length === 0) return;
-          
-          // Append skills as JSON array
-          formData.append('skills_used', JSON.stringify(projectForm[key]));
+        if (key === 'skillIds') {
+          // Send skill_ids as JSON array of UUIDs
+          formData.append('skill_ids', JSON.stringify(projectForm[key]));
         } else if (key === 'contributors') {
           formData.append(key, JSON.stringify(projectForm[key]));
         } else if (typeof projectForm[key] === 'boolean') {
@@ -362,29 +395,10 @@ export default function ProjectsPage() {
   const openEditProject = (project) => {
     setEditingProject(project);
     
-    // Parse skills_used properly - handle various formats from backend
-    let skills = [];
-    if (Array.isArray(project.skills_used)) {
-      skills = project.skills_used.map(skill => {
-        if (typeof skill === 'string') {
-          try {
-            // Try to parse if it's a JSON-encoded string
-            const parsed = JSON.parse(skill);
-            return parsed;
-          } catch {
-            // If parsing fails, use the string as-is
-            return skill;
-          }
-        }
-        return skill;
-      }).flat(); // Flatten the nested array
-    } else if (typeof project.skills_used === 'string') {
-      try {
-        skills = JSON.parse(project.skills_used);
-      } catch {
-        skills = [project.skills_used];
-      }
-    }
+    // Extract skill IDs from the SkillRead objects
+    const skillIds = Array.isArray(project.skills)
+      ? project.skills.map(s => s.id)
+      : [];
     
     // Parse contributors properly
     let contributors = {};
@@ -404,7 +418,7 @@ export default function ProjectsPage() {
       name: project.name,
       short_description: project.short_description,
       long_description: project.long_description,
-      skills_used: skills,
+      skillIds: skillIds,
       github_link_backend: project.github_link_backend || '',
       github_link_frontend: project.github_link_frontend || '',
       docker_image_link_backend: project.docker_image_link_backend || '',
@@ -433,12 +447,12 @@ export default function ProjectsPage() {
       name: '',
       short_description: '',
       long_description: '',
-      skills_used: [],
+      skillIds: [],
       github_link_backend: '',
       github_link_frontend: '',
       docker_image_link_backend: '',
       docker_image_link_frontend: '',
-      contributors: {},  // Changed
+      contributors: {},
       is_interesting_project: false,
       is_live: false,
       access_level_id: '',
@@ -446,26 +460,30 @@ export default function ProjectsPage() {
     });
     setImageFile(null);
     setImagePreview(null);
-    setCurrentSkill('');
-    setCurrentContributorName('');  // Changed
-    setCurrentContributorUsername('');  // Added
+    setCurrentContributorName('');
+    setCurrentContributorUsername('');
   };
 
-  const addSkill = () => {
-    if (currentSkill.trim() && !projectForm.skills_used.includes(currentSkill.trim())) {
+  const addSkillById = (skillId) => {
+    if (skillId && !projectForm.skillIds.includes(skillId)) {
       setProjectForm({
         ...projectForm,
-        skills_used: [...projectForm.skills_used, currentSkill.trim()],
+        skillIds: [...projectForm.skillIds, skillId],
       });
-      setCurrentSkill('');
     }
   };
 
-  const removeSkill = (skill) => {
+  const removeSkillById = (skillId) => {
     setProjectForm({
       ...projectForm,
-      skills_used: projectForm.skills_used.filter((s) => s !== skill),
+      skillIds: projectForm.skillIds.filter((id) => id !== skillId),
     });
+  };
+
+  // Helper to get skill name by ID
+  const getSkillName = (skillId) => {
+    const skill = availableSkills.find(s => s.id === skillId);
+    return skill ? skill.name : skillId;
   };
 
   const addContributor = () => {
@@ -593,51 +611,129 @@ export default function ProjectsPage() {
               </Button>
             </div>
 
-            {/* Search Bar */}
-            <div className="relative" ref={searchInputRef}>
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8892b0]" />
-              <Input
-                placeholder="Search projects by name..."
-                value={searchQuery}
-                onChange={(e) => handleSearchInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="pl-9 pr-20 bg-[#112240] border-[#172a45] text-[#ccd6f6]"
-              />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                {searchQuery && (
-                  <button
-                    onClick={clearSearch}
-                    className="p-1 text-[#8892b0] hover:text-[#ccd6f6] rounded transition-colors"
-                    title="Clear search"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-                <Button
-                  onClick={handleSearch}
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 text-[#64ffda] hover:text-[#64ffda] hover:bg-[#64ffda]/10"
-                >
-                  Search
-                </Button>
-              </div>
-
-              {/* Suggestions Dropdown */}
-              {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-[#112240] border border-[#172a45] rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
-                  {suggestions.map((suggestion, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleSuggestionClick(suggestion)}
-                      className="w-full px-4 py-2 text-left text-sm text-[#ccd6f6] hover:bg-[#172a45] transition-colors flex items-center gap-2"
+            {/* Search and Filter Section */}
+            <div className="space-y-4">
+              <div className="flex flex-col gap-4">
+                {/* Search Bar */}
+                <div className="relative" ref={searchInputRef}>
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8892b0]" />
+                  <Input
+                    placeholder="Search projects by name..."
+                    value={searchQuery}
+                    onChange={(e) => handleSearchInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    className="pl-9 pr-20 bg-[#112240] border-[#172a45] text-[#ccd6f6]"
+                  />
+                  {/* ... existing search buttons ... */}
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    {searchQuery && (
+                      <button
+                        onClick={clearSearch}
+                        className="p-1 text-[#8892b0] hover:text-[#ccd6f6] rounded transition-colors"
+                        title="Clear search"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                    <Button
+                      onClick={handleSearch}
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 text-[#64ffda] hover:text-[#64ffda] hover:bg-[#64ffda]/10"
                     >
-                      <Search className="h-3 w-3 text-[#8892b0]" />
-                      {suggestion}
-                    </button>
-                  ))}
+                      Search
+                    </Button>
+                  </div>
+                  
+                  {/* Suggestions Dropdown ... */}
+                  {showSuggestions && suggestions.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-[#112240] border border-[#172a45] rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                      {suggestions.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleSuggestionClick(suggestion)}
+                          className="w-full px-4 py-2 text-left text-sm text-[#ccd6f6] hover:bg-[#172a45] transition-colors flex items-center gap-2"
+                        >
+                          <Search className="h-3 w-3 text-[#8892b0]" />
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+
+                {/* Filter Controls */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <HierarchicalSkillSelector
+                    skills={availableSkills}
+                    categories={skillCategories}
+                    selectedSkillIds={selectedSkillFilters}
+                    onSkillSelect={(skillId) => {
+                      if (!selectedSkillFilters.includes(skillId)) {
+                        setSelectedSkillFilters((prev) => [...prev, skillId]);
+                        setIsSearching(true);
+                        setCurrentPage(1);
+                      }
+                    }}
+                    placeholder="Add skill filter…"
+                  />
+
+                  {/* Sort by Date */}
+                  <button
+                    onClick={() => {
+                      const next = sortByDate === null ? 'desc' : sortByDate === 'desc' ? 'asc' : null;
+                      setSortByDate(next);
+                      setIsSearching(true);
+                      setCurrentPage(1);
+                    }}
+                    className={`flex items-center gap-2 h-9 px-3 rounded-md border text-sm transition-colors ${
+                      sortByDate
+                        ? 'border-[#64ffda]/50 text-[#64ffda] bg-[#64ffda]/10'
+                        : 'border-[#172a45] text-[#8892b0] bg-[#0a192f] hover:border-[#64ffda]/30'
+                    }`}
+                  >
+                    <ArrowUpDown className="h-4 w-4" />
+                    {sortByDate === 'desc' ? 'Newest First' : sortByDate === 'asc' ? 'Oldest First' : 'Sort by Date'}
+                  </button>
+                </div>
+
+                {/* Active Filter Chips */}
+                {selectedSkillFilters.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    {selectedSkillFilters.map((id) => {
+                      const skill = availableSkills.find((s) => s.id === id);
+                      return (
+                        <span
+                          key={id}
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#172a45] text-xs text-[#ccd6f6] border border-[#64ffda]/20"
+                        >
+                          {skill?.name || id}
+                          <button
+                            onClick={() => {
+                              setSelectedSkillFilters((prev) => prev.filter((sid) => sid !== id));
+                              setIsSearching(true);
+                              setCurrentPage(1);
+                            }}
+                            className="ml-0.5 hover:text-red-400 transition-colors"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </span>
+                      );
+                    })}
+                    <button
+                      onClick={() => {
+                        setSelectedSkillFilters([]);
+                        setIsSearching(true);
+                        setCurrentPage(1);
+                      }}
+                      className="text-xs text-[#8892b0] hover:text-[#ccd6f6] underline ml-1 transition-colors"
+                    >
+                      Clear all
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Search Info */}
@@ -704,19 +800,19 @@ export default function ProjectsPage() {
                       <p className="text-sm text-[#8892b0] line-clamp-2">{project.short_description}</p>
 
                       {/* Skills */}
-                      {project.skills_used && project.skills_used.length > 0 && (
+                      {project.skills && project.skills.length > 0 && (
                         <div className="flex flex-wrap gap-1">
-                          {project.skills_used.slice(0, 3).map((skill, index) => (
+                          {project.skills.slice(0, 3).map((skill) => (
                             <span
-                              key={index}
+                              key={skill.id}
                               className="inline-flex items-center rounded-full bg-[#172a45] px-2 py-1 text-xs text-[#8892b0]"
                             >
-                              {skill}
+                              {skill.name}
                             </span>
                           ))}
-                          {project.skills_used.length > 3 && (
+                          {project.skills.length > 3 && (
                             <span className="inline-flex items-center rounded-full bg-[#172a45] px-2 py-1 text-xs text-[#8892b0]">
-                              +{project.skills_used.length - 3}
+                              +{project.skills.length - 3}
                             </span>
                           )}
                         </div>
@@ -846,43 +942,78 @@ export default function ProjectsPage() {
                 />
               </div>
 
-              {/* Skills Used */}
-              <div>
+              {/* Skill Selection */}
+              <div className="space-y-4 border border-[#172a45] rounded-md p-4 bg-[#0a192f]">
                 <Label className="text-[#ccd6f6]">Skills Used</Label>
-                <div className="flex gap-2 mb-2">
-                  <Input
-                    value={currentSkill}
-                    onChange={(e) => setCurrentSkill(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
-                    placeholder="Add a skill..."
-                    className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
-                  />
-                  <Button
-                    type="button"
-                    onClick={addSkill}
-                    variant="outline"
-                    size="sm"
-                    className="border-[#64ffda] text-[#64ffda] hover:bg-[#64ffda]/10"
-                  >
-                    Add
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {projectForm.skills_used.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center gap-1 rounded-full bg-[#172a45] px-3 py-1 text-sm text-[#ccd6f6]"
+                
+                <div className="flex flex-col md:flex-row gap-4">
+                  {/* Category Filter */}
+                  <div className="w-full md:w-1/3">
+                    <Label className="text-xs text-[#8892b0] mb-1.5 block">Filter by Category</Label>
+                    <select
+                      className="flex h-10 w-full rounded-md border border-[#172a45] bg-[#112240] px-3 py-2 text-sm text-[#ccd6f6] outline-none focus:border-[#64ffda]"
+                      onChange={(e) => {
+                        const categoryId = e.target.value;
+                        const validSkills = categoryId 
+                          ? availableSkills.filter(s => s.category_id === categoryId)
+                          : availableSkills;
+                        
+                        // We'll use a temporary data attribute to filter the next dropdown
+                        // This avoids adding state and re-rendering everything
+                        const skillSelect = document.getElementById('skill-selector-dropdown');
+                        if (skillSelect) {
+                          Array.from(skillSelect.options).forEach(option => {
+                            if (option.dataset.category === categoryId || params.value === "") {
+                              option.style.display = 'block';
+                            } else {
+                              option.style.display = 'none';
+                            }
+                          });
+                        }
+                        // Trigger a custom event for the UI update if needed
+                        window.dispatchEvent(new CustomEvent('category-filter-change', { detail: categoryId }));
+                      }}
                     >
-                      {skill}
-                      <button
-                        type="button"
-                        onClick={() => removeSkill(skill)}
-                        className="hover:text-red-400"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </span>
-                  ))}
+                      <option value="">All Categories</option>
+                      {skillCategories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Skills Dropdown (Filtered) */}
+                  <div className="flex-1">
+                    <Label className="text-xs text-[#8892b0] mb-1.5 block">Select Skills</Label>
+                    <SkillSelector 
+                      skills={availableSkills} 
+                      categories={skillCategories}
+                      selectedSkillIds={projectForm.skillIds}
+                      onSkillSelect={(skillId) => addSkillById(skillId)}
+                    />
+                  </div>
+                </div>
+
+                {/* Selected Skills Chips */}
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {projectForm.skillIds.map(skillId => {
+                    const skill = availableSkills.find(s => s.id === skillId);
+                    if (!skill) return null;
+                    return (
+                      <div key={skillId} className="bg-[#172a45] text-[#ccd6f6] px-2 py-1 rounded-md text-sm flex items-center gap-2 border border-[#64ffda]/30">
+                        <span>{skill.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeSkillById(skillId)}
+                          className="text-[#8892b0] hover:text-red-400"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                  {projectForm.skillIds.length === 0 && (
+                    <p className="text-sm text-[#8892b0] italic">No skills selected</p>
+                  )}
                 </div>
               </div>
 

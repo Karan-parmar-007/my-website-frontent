@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, X, Folder, ExternalLink, Github } from 'lucide-react';
+import { Search, X, Folder, ExternalLink, Github, ArrowUpDown } from 'lucide-react';
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,8 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { publicProjectsApi } from '@/lib/public_projects_apis';
+import { useSkills, useSkillCategories } from '@/lib/queries/usePortfolioQueries';
+import { HierarchicalSkillSelector } from '@/components/HierarchicalSkillSelector';
 
 const Docker = ({ className }) => (
   <svg
@@ -78,6 +80,9 @@ export default function ProjectsPage() {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedSkillIds, setSelectedSkillIds] = useState([]);
+  const [sortByDate, setSortByDate] = useState(null); // null | 'asc' | 'desc'
+
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(12);
   const [hasMorePages, setHasMorePages] = useState(false);
@@ -86,27 +91,23 @@ export default function ProjectsPage() {
   const suggestionTimeoutRef = useRef(null);
   const searchInputRef = useRef(null);
 
-  // Helper function to parse skills
+  // Fetch available skills for the filter dropdown
+  const { data: availableSkills = [] } = useSkills();
+  const { data: skillCategories = [] } = useSkillCategories();
+
+  // Helper function to extract skill names from SkillRead objects
   const parseSkills = (skillsArray) => {
     if (!Array.isArray(skillsArray)) return [];
-    return skillsArray
-      .map((skill) => {
-        if (typeof skill === 'string') {
-          try {
-            const parsed = JSON.parse(skill);
-            return Array.isArray(parsed) ? parsed : [parsed];
-          } catch {
-            return [skill];
-          }
-        }
-        return [skill];
-      })
-      .flat();
+    return skillsArray.map((skill) => {
+      if (typeof skill === 'object' && skill !== null) return skill.name;
+      if (typeof skill === 'string') return skill;
+      return String(skill);
+    }).filter(Boolean);
   };
 
   useEffect(() => {
     fetchProjects();
-  }, [currentPage]);
+  }, [currentPage, selectedSkillIds, sortByDate]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -122,8 +123,14 @@ export default function ProjectsPage() {
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const projectsData = isSearching && searchQuery
-        ? await publicProjectsApi.searchProjects(searchQuery, currentPage, pageSize)
+      const hasFilters = searchQuery || selectedSkillIds.length > 0 || sortByDate;
+      const projectsData = hasFilters
+        ? await publicProjectsApi.searchProjects(searchQuery || null, {
+            page: currentPage,
+            size: pageSize,
+            skillIds: selectedSkillIds,
+            sortByDate: sortByDate,
+          })
         : await publicProjectsApi.getAllProjects(currentPage, pageSize);
 
       setProjects(projectsData);
@@ -189,7 +196,12 @@ export default function ProjectsPage() {
     setTimeout(async () => {
       try {
         setLoading(true);
-        const projectsData = await publicProjectsApi.searchProjects(suggestion, 1, pageSize);
+        const projectsData = await publicProjectsApi.searchProjects(suggestion, {
+          page: 1,
+          size: pageSize,
+          skillIds: selectedSkillIds,
+          sortByDate: sortByDate,
+        });
         setProjects(projectsData);
         setHasMorePages(projectsData.length === pageSize);
       } catch (error) {
@@ -206,8 +218,10 @@ export default function ProjectsPage() {
     setIsSearching(false);
     setSuggestions([]);
     setShowSuggestions(false);
+    setSelectedSkillIds([]);
+    setSortByDate(null);
     setCurrentPage(1);
-
+    
     setTimeout(async () => {
       try {
         setLoading(true);
@@ -315,6 +329,78 @@ export default function ProjectsPage() {
             )}
           </div>
 
+          {/* Filter Controls */}
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            <HierarchicalSkillSelector
+              skills={availableSkills}
+              categories={skillCategories}
+              selectedSkillIds={selectedSkillIds}
+              onSkillSelect={(skillId) => {
+                if (!selectedSkillIds.includes(skillId)) {
+                  setSelectedSkillIds((prev) => [...prev, skillId]);
+                  setIsSearching(true);
+                  setCurrentPage(1);
+                }
+              }}
+              placeholder="Add skill filter…"
+            />
+
+            {/* Sort by Date */}
+            <button
+              onClick={() => {
+                const next = sortByDate === null ? 'desc' : sortByDate === 'desc' ? 'asc' : null;
+                setSortByDate(next);
+                setIsSearching(true);
+                setCurrentPage(1);
+              }}
+              className={`flex items-center gap-2 h-9 px-3 rounded-md border text-sm transition-colors ${
+                sortByDate
+                  ? 'border-[#64ffda]/50 text-[#64ffda] bg-[#64ffda]/10'
+                  : 'border-[#172a45] text-[#8892b0] bg-[#0a192f] hover:border-[#64ffda]/30'
+              }`}
+            >
+              <ArrowUpDown className="h-4 w-4" />
+              {sortByDate === 'desc' ? 'Newest First' : sortByDate === 'asc' ? 'Oldest First' : 'Sort by Date'}
+            </button>
+          </div>
+
+          {/* Active Filter Chips */}
+          {selectedSkillIds.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 mb-6">
+              {selectedSkillIds.map((id) => {
+                const skill = availableSkills.find((s) => s.id === id);
+                return (
+                  <span
+                    key={id}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#172a45] text-xs text-[#ccd6f6] border border-[#64ffda]/20"
+                  >
+                    {skill?.name || id}
+                    <button
+                      onClick={() => {
+                        setSelectedSkillIds((prev) => prev.filter((sid) => sid !== id));
+                        setIsSearching(true);
+                        setCurrentPage(1);
+                      }}
+                      className="ml-0.5 hover:text-red-400 transition-colors"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                );
+              })}
+              <button
+                onClick={() => {
+                  setSelectedSkillIds([]);
+                  setIsSearching(true);
+                  setCurrentPage(1);
+                }}
+                className="text-xs text-[#8892b0] hover:text-[#ccd6f6] underline ml-1 transition-colors"
+              >
+                Clear all
+              </button>
+            </div>
+          )}
+
           {/* Search Info */}
           {isSearching && searchQuery && (
             <div className="flex items-center justify-between px-4 py-3 mb-8 bg-[#112240] border border-[#172a45] rounded-md">
@@ -332,8 +418,23 @@ export default function ProjectsPage() {
 
           {/* Projects Grid */}
           {loading ? (
-            <div className="text-center py-20">
-              <div className="text-[#64ffda] text-lg">Loading projects...</div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-[#112240] rounded-lg overflow-hidden animate-pulse">
+                  <div className="h-48 bg-[#172a45]" />
+                  <div className="p-6 space-y-4">
+                    <div className="h-5 bg-[#172a45] rounded w-3/4" />
+                    <div className="space-y-2">
+                      <div className="h-3 bg-[#172a45] rounded w-full" />
+                      <div className="h-3 bg-[#172a45] rounded w-5/6" />
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="h-5 bg-[#172a45] rounded-full w-16" />
+                      <div className="h-5 bg-[#172a45] rounded-full w-12" />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : projects.length === 0 ? (
             <div className="text-center py-20">
@@ -345,7 +446,7 @@ export default function ProjectsPage() {
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
               {projects.map((project) => {
-                const skills = parseSkills(project.skills_used);
+                const skills = parseSkills(project.skills);
                 const hasBackend = project.github_link_backend;
                 const hasFrontend = project.github_link_frontend;
                 const hasDockerBackend = project.docker_image_link_backend;

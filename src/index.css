@@ -52,3 +52,120 @@ body {
   background-color: #0a192f;
   color: #ccd6f6;
 }
+
+/* -----------------------------------------------------
+   Glassmorphism Utilities
+----------------------------------------------------- */
+.glass {
+  background: rgba(17, 34, 64, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(100, 255, 218, 0.1);
+}
+
+.glass-hover:hover {
+  background: rgba(17, 34, 64, 0.85);
+  border-color: rgba(100, 255, 218, 0.2);
+  transition: all 0.3s ease;
+}
+
+/* -----------------------------------------------------
+   Gradient Text
+----------------------------------------------------- */
+.gradient-text {
+  background: linear-gradient(135deg, #64ffda 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-warm {
+  background: linear-gradient(135deg, #f472b6 0%, #fb923c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* -----------------------------------------------------
+   Glow Effects
+----------------------------------------------------- */
+.glow {
+  box-shadow: 0 0 20px rgba(100, 255, 218, 0.15);
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 30px rgba(100, 255, 218, 0.25);
+  transition: box-shadow 0.3s ease;
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(100, 255, 218, 0.3);
+}
+
+/* -----------------------------------------------------
+   Card Enhancements
+----------------------------------------------------- */
+.card-elevated {
+  background: linear-gradient(145deg, #112240 0%, #0a192f 100%);
+  border: 1px solid rgba(100, 255, 218, 0.05);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+.card-elevated:hover {
+  border-color: rgba(100, 255, 218, 0.15);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* -----------------------------------------------------
+   Skeleton Loading Animation
+----------------------------------------------------- */
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #172a45 25%, #233554 50%, #172a45 75%);
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+/* -----------------------------------------------------
+   Custom Scrollbar
+----------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a192f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #172a45;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #233554;
+}
+
+/* -----------------------------------------------------
+   Focus States
+----------------------------------------------------- */
+.focus-ring:focus {
+  outline: none;
+  box-shadow:
+    0 0 0 2px #0a192f,
+    0 0 0 4px rgba(100, 255, 218, 0.5);
+}

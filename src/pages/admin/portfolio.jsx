@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, FolderKanban, Users, Briefcase, LogOut, Plus, Edit,UsersIcon, Trash2, Upload, X, Shield } from 'lucide-react';
+import { Home, FolderKanban, Users, Briefcase, LogOut, Plus, Edit, UsersIcon, Trash2, Upload, X, Shield } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -30,7 +30,33 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
-import { portfolioAdminApi } from '@/lib/portfolio_admin_apis';
+import { CardSkeleton } from '@/components/Skeleton';
+import {
+  useProfileInfo,
+  useEducation,
+  useWorkExperience,
+  useSkills,
+  useSkillCategories,
+  useUpdateProfile,
+  useCreateProfile,
+  useCreateEducation,
+  useUpdateEducation,
+  useDeleteEducation,
+  useCreateWorkExperience,
+  useUpdateWorkExperience,
+  useDeleteWorkExperience,
+  useCreateSkillCategory,
+  useUpdateSkillCategory,
+  useDeleteSkillCategory,
+  useCreateSkill,
+  useUpdateSkill,
+  useDeleteSkill,
+  useSocialMedia,
+  useCreateSocialMedia,
+  useUpdateSocialMedia,
+  useDeleteSocialMedia,
+} from '@/lib/queries/usePortfolioQueries';
+
 
 const menuItems = [
   { title: 'Dashboard', url: '/admin/dashboard', icon: Home },
@@ -123,81 +149,91 @@ function AppSidebar() {
 }
 
 export default function Portfolio() {
-  const [loading, setLoading] = useState(true);
-  const [profileData, setProfileData] = useState(null);
-  const [education, setEducation] = useState([]);
-  const [workExperience, setWorkExperience] = useState([]);
-  const [skills, setSkills] = useState([]);
-  const [skillCategories, setSkillCategories] = useState([]);
+  // React Query hooks for data fetching
+  const { data: profileData, isLoading: profileLoading } = useProfileInfo();
+  const { data: eduData = [], isLoading: eduLoading } = useEducation();
+  const { data: workData = [], isLoading: workLoading } = useWorkExperience();
+  const { data: skillsData = [], isLoading: skillsLoading } = useSkills();
+  const { data: categoriesData = [], isLoading: categoriesLoading } = useSkillCategories();
+  const { data: socialData = [], isLoading: socialLoading } = useSocialMedia();
+
+  // React Query mutations
+  const updateProfileMutation = useUpdateProfile();
+  const createProfileMutation = useCreateProfile();
+  const createEducationMutation = useCreateEducation();
+  const updateEducationMutation = useUpdateEducation();
+  const deleteEducationMutation = useDeleteEducation();
+  const createWorkMutation = useCreateWorkExperience();
+  const updateWorkMutation = useUpdateWorkExperience();
+  const deleteWorkMutation = useDeleteWorkExperience();
+  const createSkillCategoryMutation = useCreateSkillCategory();
+  const updateSkillCategoryMutation = useUpdateSkillCategory();
+  const deleteSkillCategoryMutation = useDeleteSkillCategory();
+  const createSkillMutation = useCreateSkill();
+  const updateSkillMutation = useUpdateSkill();
+  const deleteSkillMutation = useDeleteSkill();
+  const createSocialMutation = useCreateSocialMedia();
+  const updateSocialMutation = useUpdateSocialMedia();
+  const deleteSocialMutation = useDeleteSocialMedia();
+
+  // Sorted data via useMemo
+  const education = useMemo(() => 
+    [...eduData].sort((a, b) => a.sequence - b.sequence),
+    [eduData]
+  );
+  const workExperience = useMemo(() => 
+    [...workData].sort((a, b) => a.sequence - b.sequence),
+    [workData]
+  );
+  const skills = skillsData;
+  const skillCategories = categoriesData;
+  const socialMedia = socialData;
+
+  // Overall loading state
+  const loading = profileLoading || eduLoading || workLoading || skillsLoading || categoriesLoading || socialLoading;
   
   // Dialog states
   const [educationDialog, setEducationDialog] = useState(false);
   const [workDialog, setWorkDialog] = useState(false);
   const [skillDialog, setSkillDialog] = useState(false);
   const [categoryDialog, setCategoryDialog] = useState(false);
+  const [socialDialog, setSocialDialog] = useState(false);
   
   // Form states
   const [currentEducation, setCurrentEducation] = useState(null);
   const [currentWork, setCurrentWork] = useState(null);
   const [currentSkill, setCurrentSkill] = useState(null);
   const [currentCategory, setCurrentCategory] = useState(null);
+  const [currentSocial, setCurrentSocial] = useState(null);
   
   // Work experience description state
   const [workDescriptions, setWorkDescriptions] = useState([]);
   
-  // Profile form state
+  // Profile form state - initialize from profileData when it loads
   const [profileForm, setProfileForm] = useState({
     name: '',
     email: '',
     phone: '',
     headline: '',
     about: '',
-    github_url: '',
-    linkedin_url: '',
-    instagram: '',
     profile_image: null,
     resume_file: null,
   });
 
+  // Update profile form when data loads
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const [profileRes, eduRes, workRes, skillsRes, categoriesRes] = await Promise.allSettled([
-        portfolioAdminApi.getProfileInfo(),
-        portfolioAdminApi.getEducation(),
-        portfolioAdminApi.getWorkExperience(),
-        portfolioAdminApi.getSkills(),
-        portfolioAdminApi.getSkillCategories(),
-      ]);
-
-      if (profileRes.status === 'fulfilled') {
-        setProfileData(profileRes.value);
-        setProfileForm({
-          name: profileRes.value.name || '',
-          email: profileRes.value.email || '',
-          phone: profileRes.value.phone || '',
-          headline: profileRes.value.headline || '',
-          about: profileRes.value.about || '',
-          github_url: profileRes.value.github_url || '',
-          linkedin_url: profileRes.value.linkedin_url || '',
-          instagram: profileRes.value.instagram || '',
-          profile_image: null,
-          resume_file: null,
-        });
-      }
-      if (eduRes.status === 'fulfilled') setEducation(eduRes.value);
-      if (workRes.status === 'fulfilled') setWorkExperience(workRes.value);
-      if (skillsRes.status === 'fulfilled') setSkills(skillsRes.value);
-      if (categoriesRes.status === 'fulfilled') setSkillCategories(categoriesRes.value);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
+    if (profileData) {
+      setProfileForm({
+        name: profileData.name || '',
+        email: profileData.email || '',
+        phone: profileData.phone || '',
+        headline: profileData.headline || '',
+        about: profileData.about || '',
+        profile_image: null,
+        resume_file: null,
+      });
     }
-  };
+  }, [profileData]);
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
@@ -210,12 +246,12 @@ export default function Portfolio() {
       });
 
       if (profileData) {
-        await portfolioAdminApi.updateProfileInfo(formData);
+        await updateProfileMutation.mutateAsync(formData);
       } else {
-        await portfolioAdminApi.createProfileInfo(formData);
+        await createProfileMutation.mutateAsync(formData);
       }
       
-      await fetchData();
+      // Cache automatically invalidated by mutation - no manual refetch needed
       alert('Profile updated successfully!');
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -243,11 +279,11 @@ export default function Portfolio() {
 
     try {
       if (currentEducation) {
-        await portfolioAdminApi.updateEducation(data);
+        await updateEducationMutation.mutateAsync(data);
       } else {
-        await portfolioAdminApi.createEducation(data);
+        await createEducationMutation.mutateAsync(data);
       }
-      await fetchData();
+      // Cache automatically invalidated by mutation
       setEducationDialog(false);
       setCurrentEducation(null);
     } catch (error) {
@@ -271,11 +307,11 @@ export default function Portfolio() {
 
     try {
       if (currentWork) {
-        await portfolioAdminApi.updateWorkExperience({ id: currentWork.id, ...data });
+        await updateWorkMutation.mutateAsync({ id: currentWork.id, ...data });
       } else {
-        await portfolioAdminApi.createWorkExperience(data);
+        await createWorkMutation.mutateAsync(data);
       }
-      await fetchData();
+      // Cache automatically invalidated by mutation
       setWorkDialog(false);
       setCurrentWork(null);
       setWorkDescriptions([]);
@@ -294,11 +330,11 @@ export default function Portfolio() {
 
     try {
       if (currentCategory) {
-        await portfolioAdminApi.updateSkillCategory({ id: currentCategory.id, ...data });
+        await updateSkillCategoryMutation.mutateAsync({ id: currentCategory.id, ...data });
       } else {
-        await portfolioAdminApi.createSkillCategory(data);
+        await createSkillCategoryMutation.mutateAsync(data);
       }
-      await fetchData();
+      // Cache automatically invalidated by mutation
       setCategoryDialog(false);
       setCurrentCategory(null);
     } catch (error) {
@@ -325,16 +361,39 @@ export default function Portfolio() {
 
     try {
       if (currentSkill) {
-        await portfolioAdminApi.updateSkill(formData);
+        await updateSkillMutation.mutateAsync(formData);
       } else {
-        await portfolioAdminApi.createSkill(formData);
+        await createSkillMutation.mutateAsync(formData);
       }
-      await fetchData();
+      // Cache automatically invalidated by mutation
       setSkillDialog(false);
       setCurrentSkill(null);
     } catch (error) {
       console.error('Error saving skill:', error);
       alert('Failed to save skill');
+    }
+  };
+
+  const handleSocialSubmit = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const data = {
+      name: form.get('name'),
+      link: form.get('link'),
+    };
+
+    try {
+      if (currentSocial) {
+        await updateSocialMutation.mutateAsync({ id: currentSocial.id, ...data });
+      } else {
+        await createSocialMutation.mutateAsync(data);
+      }
+      // Cache automatically invalidated by mutation
+      setSocialDialog(false);
+      setCurrentSocial(null);
+    } catch (error) {
+      console.error('Error saving social media:', error);
+      alert('Failed to save social media');
     }
   };
 
@@ -344,19 +403,22 @@ export default function Portfolio() {
     try {
       switch (type) {
         case 'education':
-          await portfolioAdminApi.deleteEducation(id);
+          await deleteEducationMutation.mutateAsync(id);
           break;
         case 'work':
-          await portfolioAdminApi.deleteWorkExperience(id);
+          await deleteWorkMutation.mutateAsync(id);
           break;
         case 'skill':
-          await portfolioAdminApi.deleteSkill(id);
+          await deleteSkillMutation.mutateAsync(id);
           break;
         case 'category':
-          await portfolioAdminApi.deleteSkillCategory(id);
+          await deleteSkillCategoryMutation.mutateAsync(id);
+          break;
+        case 'social':
+          await deleteSocialMutation.mutateAsync(id);
           break;
       }
-      await fetchData();
+      // Cache automatically invalidated by mutation
     } catch (error) {
       console.error('Error deleting:', error);
       alert('Failed to delete item');
@@ -460,39 +522,20 @@ export default function Portfolio() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="github_url" className="text-[#ccd6f6]">GitHub URL</Label>
-                    <Input
-                      id="github_url"
-                      value={profileForm.github_url}
-                      onChange={(e) => setProfileForm({ ...profileForm, github_url: e.target.value })}
-                      className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="linkedin_url" className="text-[#ccd6f6]">LinkedIn URL</Label>
-                    <Input
-                      id="linkedin_url"
-                      value={profileForm.linkedin_url}
-                      onChange={(e) => setProfileForm({ ...profileForm, linkedin_url: e.target.value })}
-                      className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="instagram" className="text-[#ccd6f6]">Instagram</Label>
-                    <Input
-                      id="instagram"
-                      value={profileForm.instagram}
-                      onChange={(e) => setProfileForm({ ...profileForm, instagram: e.target.value })}
-                      className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
-                    />
-                  </div>
-                </div>
+
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="profile_image" className="text-[#ccd6f6]">Profile Image</Label>
+                    {profileData?.has_profile_image && (
+                      <div className="mb-2">
+                        <img 
+                          src={`${window.env?.VITE_API_URL || import.meta.env.VITE_API_URL}/v1/portfolio/profile-info/image`} 
+                          alt="Current Profile" 
+                          className="h-20 w-20 object-cover rounded border border-[#172a45]"
+                        />
+                      </div>
+                    )}
                     <Input
                       id="profile_image"
                       type="file"
@@ -503,6 +546,18 @@ export default function Portfolio() {
                   </div>
                   <div>
                     <Label htmlFor="resume_file" className="text-[#ccd6f6]">Resume File</Label>
+                    {profileData?.has_resume && (
+                      <div className="mb-2">
+                        <a 
+                          href={`${window.env?.VITE_API_URL || import.meta.env.VITE_API_URL}/v1/portfolio/profile-info/resume`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-[#64ffda] underline text-sm"
+                        >
+                          View Current Resume
+                        </a>
+                      </div>
+                    )}
                     <Input
                       id="resume_file"
                       type="file"
@@ -735,6 +790,64 @@ export default function Portfolio() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Social Media Section */}
+            <div className="rounded-lg border border-[#172a45] bg-[#112240] p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-[#ccd6f6]">Social Media</h2>
+                <Button
+                  onClick={() => {
+                    setCurrentSocial(null);
+                    setSocialDialog(true);
+                  }}
+                  size="sm"
+                  variant="outline"
+                  className="border-[#64ffda] text-[#64ffda] hover:bg-[#64ffda]/10"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Social Media
+                </Button>
+              </div>
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {socialMedia.map((social) => (
+                    <div key={social.id} className="p-4 bg-[#0a192f] rounded-lg border border-[#172a45] flex items-center justify-between">
+                      <div className="overflow-hidden">
+                        <h3 className="font-semibold text-[#ccd6f6] capitalize">{social.name}</h3>
+                        <a 
+                          href={social.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-sm text-[#64ffda] truncate block hover:underline"
+                        >
+                          {social.link}
+                        </a>
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        <button
+                          onClick={() => {
+                            setCurrentSocial(social);
+                            setSocialDialog(true);
+                          }}
+                          className="p-2 text-[#64ffda] hover:bg-[#64ffda]/10 rounded transition-colors"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete('social', social.id)}
+                          className="p-2 text-red-400 hover:bg-red-400/10 rounded transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  {socialMedia.length === 0 && (
+                    <p className="text-[#8892b0] col-span-full py-4 text-center">No social media links added yet.</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -1042,6 +1155,58 @@ export default function Portfolio() {
                 type="button" 
                 variant="outline" 
                 onClick={() => setSkillDialog(false)}
+                className="border-[#172a45] text-[#8892b0] hover:bg-[#172a45] hover:text-[#ccd6f6]"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                variant="outline"
+                className="border-[#64ffda] text-[#64ffda] hover:bg-[#64ffda]/10"
+              >
+                Save
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Social Media Dialog */}
+      <Dialog open={socialDialog} onOpenChange={setSocialDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{currentSocial ? 'Edit' : 'Add'} Social Media</DialogTitle>
+            <DialogDescription>Add a link to your social media profile</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSocialSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="social-name" className="text-[#ccd6f6]">Name</Label>
+              <Input
+                id="social-name"
+                name="name"
+                defaultValue={currentSocial?.name}
+                required
+                placeholder="e.g. Github, LinkedIn"
+                className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
+              />
+            </div>
+            <div>
+              <Label htmlFor="social-link" className="text-[#ccd6f6]">Link URL</Label>
+              <Input
+                id="social-link"
+                name="link"
+                defaultValue={currentSocial?.link}
+                required
+                type="url"
+                placeholder="https://..."
+                className="bg-[#0a192f] border-[#172a45] text-[#ccd6f6]"
+              />
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setSocialDialog(false)}
                 className="border-[#172a45] text-[#8892b0] hover:bg-[#172a45] hover:text-[#ccd6f6]"
               >
                 Cancel

@@ -1,35 +1,39 @@
-import { Github, Instagram, Linkedin } from 'lucide-react';
-import { useProfileData } from '@/hooks/usePortfolioData';
+import { useProfileInfo } from '@/lib/queries/usePortfolioQueries';
+import { useSocialMedia } from '@/lib/queries/usePortfolioQueries';
+import icons from './social-icons';
 
 const Footer = () => {
-  const { profileData } = useProfileData();
+    const { data: profileData } = useProfileInfo();
+    const { data: socialLinks = [] } = useSocialMedia();
 
-  const socialLinks = [
-    { icon: Github, url: profileData?.github_url, label: 'GitHub' },
-    { icon: Instagram, url: profileData?.instagram, label: 'Instagram' },
-    { icon: Linkedin, url: profileData?.linkedin_url, label: 'LinkedIn' },
-  ].filter(link => link.url);
+    // Filter out links that don't have a URL or a matching icon
+    const visibleLinks = socialLinks.filter(
+        (link) => link.link && icons[link.name.toLowerCase()]
+    );
 
-  return (
-    <footer className="w-full flex flex-col items-center pt-24 pb-8 text-[#8892b0] text-sm">
-      {/* Mobile Social Icons */}
-      <div className="flex md:hidden gap-4 mb-2 pb-4">
-        {socialLinks.map((link) => (
-          <a
-            key={link.label}
-            href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#8892b0] hover:text-[#64ffda] transition-colors"
-            aria-label={link.label}
-          >
-            <link.icon className="w-5 h-5" />
-          </a>
-        ))}
-      </div>
-      <div>Designed & Built by {profileData?.name || 'Karan Parmar'}</div>
-    </footer>
-  );
+    return (
+        <footer className="w-full flex flex-col items-center pt-24 pb-8 text-[#8892b0] text-sm">
+            {/* Mobile Social Icons */}
+            <div className="flex md:hidden gap-4 mb-2 pb-4">
+                {visibleLinks.map((link) => {
+                    const IconComponent = icons[link.name.toLowerCase()];
+                    return (
+                        <a
+                            key={link.id || link.name}
+                            href={link.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#8892b0] hover:text-[#64ffda] transition-colors"
+                            aria-label={link.name}
+                        >
+                            <IconComponent className="w-5 h-5" />
+                        </a>
+                    );
+                })}
+            </div>
+            <div>Designed & Built by {profileData?.name || 'Karan Parmar'}</div>
+        </footer>
+    );
 };
 
 export default Footer;

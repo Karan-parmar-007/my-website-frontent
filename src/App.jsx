@@ -1,8 +1,4 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Loader from '@/components/loader';
-import { AuthProvider } from '@/contexts/AuthContext';
 import { RoleProvider } from '@/contexts/RoleContext';
 import { PublicOnlyRoute, PrivateRoute } from '@/components/ProtectedRoute';
 import { RoleProtectedRoute } from '@/components/RoleProtectedRoute';
@@ -13,6 +9,7 @@ import Signup from '@/pages/signup';
 import AdminDashboard from '@/pages/admin/dashboard';
 import Portfolio from '@/pages/admin/portfolio';
 import AdminProjectsPage from '@/pages/admin/projects';
+import SkillsPage from '@/pages/skills';
 import ProjectAccessLevelPage from '@/pages/admin/project_access_level';
 import ProjectMembershipPage from '@/pages/admin/project_membership';
 import NotFound from '@/pages/NotFound';
@@ -26,23 +23,15 @@ import MyAccount from '@/pages/MyAccount';
 import { ToastProvider } from '@/components/ui/toast';
 
 function App() {
-  const [showContent, setShowContent] = useState(false);
-
   return (
-    <AuthProvider>
-      <RoleProvider>
-        <ToastProvider>
-          <Router>
-          <Loader onLoadComplete={() => setShowContent(true)} />
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: showContent ? 1 : 0 }}
-            transition={{ duration: 0.5 }}
-            className="min-h-screen"
-          >
+    <RoleProvider>
+      <ToastProvider>
+        <Router>
+          <div className="min-h-screen">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/skills" element={<SkillsPage />} />
               <Route 
                 path="/login" 
                 element={
@@ -173,11 +162,10 @@ function App() {
               {/* 404 - Must be last */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </motion.div>
+          </div>
         </Router>
-        </ToastProvider>
-      </RoleProvider>
-    </AuthProvider>
+      </ToastProvider>
+    </RoleProvider>
   );
 }
 

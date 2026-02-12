@@ -28,12 +28,17 @@ export const publicProjectsApi = {
     return response.data;
   },
 
-  // Search projects
-  searchProjects: async (query, page = 1, size = 12) => {
+  // Search projects with skill filters and date sorting
+  searchProjects: async (query, { page = 1, size = 12, skillIds = [], sortByDate = null } = {}) => {
+    const params = { page, size };
+    if (query) params.q = query;
+    if (skillIds.length > 0) params.skillIds = skillIds;
+    if (sortByDate) params.sortByDate = sortByDate;
     const response = await api.get('/project/projects/search', {
-      params: { q: query, page, size },
+      params,
+      paramsSerializer: { indexes: null },
     });
-    return response.data;
+    return response.data.items || response.data || [];
   },
 
   // Get project suggestions

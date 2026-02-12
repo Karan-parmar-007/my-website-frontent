@@ -1,23 +1,33 @@
-import axios from 'axios';
+// Import the shared apiClient which has CSRF token interceptors
+import apiClient from './apiClient';
 
 // Normalize base URL and ensure /api/v1 prefix
 const API_URL = window.env?.VITE_API_URL || import.meta.env.VITE_API_URL;
 const API_PREFIX = '/v1';
 const API_V1_BASE_URL = `${API_URL}${API_PREFIX}`;
 
-// Axios instance with cookies
-const apiClient = axios.create({
-  baseURL: API_V1_BASE_URL,
-  withCredentials: true,
-  headers: { 'Content-Type': 'application/json' },
-});
+// Helper to get CSRF token from cookies for fetch requests
+const getCsrfToken = () => {
+  const match = document.cookie.match(/(^|;\s*)csrf_token=([^;]+)/);
+  return match ? match[2] : null;
+};
+
+// Helper to get headers with CSRF token for fetch requests
+const getHeadersWithCsrf = (contentType = 'application/json') => {
+  const headers = { 'Content-Type': contentType };
+  const csrfToken = getCsrfToken();
+  if (csrfToken) {
+    headers['X-CSRF-Token'] = csrfToken;
+  }
+  return headers;
+};
 
 // Login with JSON body
 export const loginUser = async ({ email, password }) => {
   const response = await fetch(`${API_V1_BASE_URL}/user/login`, {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeadersWithCsrf(),
     body: JSON.stringify({ email, password }),
   });
 
@@ -49,7 +59,7 @@ export const registerUser = async ({ name, email, password }) => {
   const response = await fetch(`${API_V1_BASE_URL}/user/register`, {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeadersWithCsrf(),
     body: JSON.stringify(payload),
   });
 
@@ -92,7 +102,7 @@ export const logoutUser = async () => {
   const response = await fetch(`${API_V1_BASE_URL}/user/logout`, {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeadersWithCsrf(),
   });
 
   if (!response.ok) {
@@ -152,7 +162,7 @@ export const validateUserRole = async (requiredRoles) => {
   const response = await fetch(`${API_V1_BASE_URL}/user/role-validator`, {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeadersWithCsrf(),
     body: JSON.stringify({ required_roles: requiredRoles }),
   });
 
@@ -168,7 +178,7 @@ export const forgotPassword = async (email) => {
   const response = await fetch(`${API_V1_BASE_URL}/user/password/forgot`, {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeadersWithCsrf(),
     body: JSON.stringify({ email }),
   });
 
@@ -189,7 +199,7 @@ export const verifyOTPAndReset = async (otp, newPassword) => {
   const response = await fetch(`${API_V1_BASE_URL}/user/password/verify-otp`, {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeadersWithCsrf(),
     body: JSON.stringify({ otp, new_password: newPassword }),
   });
 
@@ -206,15 +216,16 @@ export const verifyOTPAndReset = async (otp, newPassword) => {
 };
 
 // Change password (logged-in user)
-export const changePassword = async (currentPassword, newPassword, confirmPassword) => {
-  const response = await fetch(`${API_V1_BASE_URL}/user/password/change`, {
+export const changePassword = async (currentPassword, newPassword, confirmPassword, logoutAllDevices = false) => {
+  const response = await fetch(`${API_V1_BASE_URL}/auth/change-password`, {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeadersWithCsrf(),
     body: JSON.stringify({ 
-      current_password: currentPassword, 
-      new_password: newPassword,
-      confirm_password: confirmPassword
+      currentPassword, 
+      newPassword,
+      confirmPassword,
+      logoutAllDevices
     }),
   });
 
@@ -235,7 +246,7 @@ export const updateCurrentUser = async (userData) => {
   const response = await fetch(`${API_V1_BASE_URL}/user/me`, {
     method: 'PUT',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeadersWithCsrf(),
     body: JSON.stringify(userData),
   });
 
@@ -256,7 +267,7 @@ export const adminResetPassword = async (userId, email, newPassword) => {
   const response = await fetch(`${API_V1_BASE_URL}/user/password/admin-reset`, {
     method: 'POST',
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeadersWithCsrf(),
     body: JSON.stringify({ 
       user_id: userId,
       email: email,
@@ -274,4 +285,73 @@ export const adminResetPassword = async (userId, email, newPassword) => {
   }
 
   return response.json();
+};
+
+// Get all active sessions
+export const getSessions = async () => {
+  const response = await fetch(`${API_V1_BASE_URL}/auth/sessions`, {
+    method: 'GET',
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    let errorDetail = 'Failed to fetch sessions';
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
+  }
+
+  return response.json();
+};
+
+// Delete a specific session
+export const deleteSession = async (sessionId) => {
+  const response = await fetch(`${API_V1_BASE_URL}/auth/sessions/${sessionId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: getHeadersWithCsrf(),
+  });
+
+  if (!response.ok) {
+    let errorDetail = 'Failed to delete session';
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
+  }
+
+  // Handle 204 No Content or JSON response
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return response.json();
+  }
+  return { success: true };
+};
+
+// Revoke all sessions (except current)
+export const revokeAllSessions = async () => {
+  const response = await fetch(`${API_V1_BASE_URL}/auth/sessions`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: getHeadersWithCsrf(),
+  });
+
+  if (!response.ok) {
+    let errorDetail = 'Failed to revoke sessions';
+    try {
+      const err = await response.json();
+      errorDetail = err.detail || errorDetail;
+    } catch {}
+    throw new Error(errorDetail);
+  }
+
+  // Handle 204 No Content or JSON response
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return response.json();
+  }
+  return { success: true };
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Navbar from '@/components/navbar';
 import SocialLinks from '@/components/social-links';
 import EmailLink from '@/components/email-link';
@@ -7,10 +7,11 @@ import EducationCard from '@/components/education-card';
 import Footer from '@/components/footer';
 import Loader from '@/components/loader';
 import { Button } from '@/components/ui/button';
-import { portfolioApi } from '@/lib/portfolio_apis';
-import { publicProjectsApi } from '@/lib/public_projects_apis';
+import { useProfileInfo, useWorkExperience, useEducation } from '@/lib/queries/usePortfolioQueries';
+import { useFeaturedProjects, useLatestProjects } from '@/lib/queries/useProjectQueries';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+
 
 // Icon components
 const ExternalLink = ({ className }) => (
@@ -124,84 +125,51 @@ const Shield = ({ className }) => (
 export default function Home() {
     const navigate = useNavigate();
     const { user, loading: authLoading } = useAuth();
-    const [profileData, setProfileData] = useState(null);
-    const [workExperience, setWorkExperience] = useState([]);
-    const [education, setEducation] = useState([]);
-    const [featuredProjects, setFeaturedProjects] = useState([]);
-    const [otherProjects, setOtherProjects] = useState([]);
-    const [loading, setLoading] = useState(true);
+    
+    // React Query hooks - automatic caching and deduplication
+    const { data: profileData, isLoading: profileLoading } = useProfileInfo();
+    const { data: workData = [], isLoading: workLoading } = useWorkExperience();
+    const { data: eduData = [], isLoading: eduLoading } = useEducation();
+    const { data: featuredProjects = [], isLoading: featuredLoading } = useFeaturedProjects();
+    const { data: otherProjects = [], isLoading: latestLoading } = useLatestProjects();
+    
+    // UI state
     const [activeWork, setActiveWork] = useState(null);
     const [showContent, setShowContent] = useState(false);
 
-    // Helper function to parse skills
+    // Compute overall loading state from all queries
+    const loading = profileLoading || workLoading || eduLoading || featuredLoading || latestLoading;
+
+    // Sorted data computed via useMemo to avoid re-sorting on every render
+    const workExperience = useMemo(() => 
+        [...workData].sort((a, b) => b.sequence - a.sequence), 
+        [workData]
+    );
+    
+    const education = useMemo(() => 
+        [...eduData].sort((a, b) => b.sequence - a.sequence), 
+        [eduData]
+    );
+
+    // Set initial active work when data loads
+    useEffect(() => {
+        if (workExperience.length > 0 && !activeWork) {
+            setActiveWork(workExperience[0].id);
+        }
+    }, [workExperience, activeWork]);
+
+    // Helper function to extract skill names from SkillRead objects
     const parseSkills = (skillsArray) => {
         if (!Array.isArray(skillsArray)) return [];
-        return skillsArray
-            .map((skill) => {
-                if (typeof skill === 'string') {
-                    try {
-                        const parsed = JSON.parse(skill);
-                        return Array.isArray(parsed) ? parsed : [parsed];
-                    } catch {
-                        return [skill];
-                    }
-                }
-                return [skill];
-            })
-            .flat();
+        return skillsArray.map((skill) => {
+            if (typeof skill === 'object' && skill !== null) return skill.name;
+            if (typeof skill === 'string') return skill;
+            return String(skill);
+        }).filter(Boolean);
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const calls = [
-                    portfolioApi.getProfileInfo(),
-                    portfolioApi.getWorkExperience(),
-                    portfolioApi.getEducation(),
-                    publicProjectsApi.getFeaturedProjects(),
-                    publicProjectsApi.getLatestProjects(),
-                ];
-
-                const [profileRes, workRes, eduRes, featuredRes, latestRes] = await Promise.allSettled(calls);
-
-                const profile = profileRes.status === 'fulfilled' ? profileRes.value : null;
-                const work = workRes.status === 'fulfilled' ? workRes.value : [];
-                const edu = eduRes.status === 'fulfilled' ? eduRes.value : [];
-                const featured = featuredRes.status === 'fulfilled' ? featuredRes.value : [];
-                const latest = latestRes.status === 'fulfilled' ? latestRes.value : [];
-
-                if (profileRes.status === 'rejected') console.warn('getProfileInfo failed', profileRes.reason);
-                if (workRes.status === 'rejected') console.warn('getWorkExperience failed', workRes.reason);
-                if (eduRes.status === 'rejected') console.warn('getEducation failed', eduRes.reason);
-                if (featuredRes.status === 'rejected') console.warn('getFeaturedProjects failed', featuredRes.reason);
-                if (latestRes.status === 'rejected') console.warn('getLatestProjects failed', latestRes.reason);
-
-                setProfileData(profile);
-
-                const sortedWorkExperience = work.sort((a, b) => b.sequence - a.sequence);
-                setWorkExperience(sortedWorkExperience);
-
-                const sortedEducation = edu.sort((a, b) => b.sequence - a.sequence);
-                setEducation(sortedEducation);
-
-                setFeaturedProjects(featured);
-                setOtherProjects(latest);
-
-                if (sortedWorkExperience.length > 0) {
-                    setActiveWork(sortedWorkExperience[0].id);
-                }
-            } catch (error) {
-                console.error('Unexpected error fetching data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    // Wait for both auth and data loading
-    if (loading || !showContent || authLoading) {
+    // Show intro animation once (independent of data loading)
+    if (!showContent) {
         return <Loader onLoadComplete={() => setShowContent(true)} />;
     }
 
@@ -224,13 +192,13 @@ export default function Home() {
                         <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#8892b0] mb-8 break-words">
                             {profileData?.headline || 'I build things that solves real word problems.'}
                         </h2>
-                        {profileData?.resume_file_base64 && (
+                        {profileData?.has_resume && (
                             <Button
                                 onClick={() => {
-                                    const link = document.createElement('a');
-                                    link.href = `data:application/pdf;base64,${profileData.resume_file_base64}`;
-                                    link.download = 'resume.pdf';
-                                    link.click();
+                                    const API_URL = window.env?.VITE_API_URL || import.meta.env.VITE_API_URL;
+                                    const API_PREFIX = '/v1';
+                                    const resumeUrl = `${API_URL}${API_PREFIX}/portfolio/profile-info/resume`;
+                                    window.open(resumeUrl, '_blank');
                                 }}
                                 className="w-fit px-7 py-5 border border-[#64ffda] text-[#64ffda] bg-transparent hover:bg-[#64ffda]/10 rounded text-base"
                             >
@@ -277,12 +245,19 @@ export default function Home() {
                                 <div className="relative w-full max-w-[310px] h-[310px] mx-auto">
                                     <div className="relative group">
                                         <div className="relative w-full h-full rounded border-[#64ffda]">
-                                            {profileData?.profile_image_base64 ? (
-                                                <img
-                                                    src={`data:image/jpeg;base64,${profileData.profile_image_base64}`}
-                                                    alt="Profile"
-                                                    className="rounded w-full h-full object-cover transition-all duration-200"
-                                                />
+                                            {profileData?.has_profile_image ? (
+                                                (() => {
+                                                    const API_URL = window.env?.VITE_API_URL || import.meta.env.VITE_API_URL;
+                                                    const API_PREFIX = '/v1';
+                                                    const imageUrl = `${API_URL}${API_PREFIX}/portfolio/profile-info/image`;
+                                                    return (
+                                                        <img
+                                                            src={imageUrl}
+                                                            alt="Profile"
+                                                            className="rounded w-full h-full object-cover transition-all duration-200"
+                                                        />
+                                                    );
+                                                })()
                                             ) : (
                                                 <div className="w-full h-full bg-[#112240] rounded" />
                                             )}
@@ -331,7 +306,7 @@ export default function Home() {
 
                             <div className="space-y-24">
                                 {featuredProjects.map((project, index) => {
-                                    const skills = parseSkills(project.skills_used);
+                                    const skills = parseSkills(project.skills);
                                     const hasBackend = project.github_link_backend;
                                     const hasFrontend = project.github_link_frontend;
                                     const hasDockerBackend = project.docker_image_link_backend;
@@ -508,7 +483,7 @@ export default function Home() {
 
                             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {otherProjects.map((project) => {
-                                    const skills = parseSkills(project.skills_used);
+                                    const skills = parseSkills(project.skills);
                                     const hasBackend = project.github_link_backend;
                                     const hasFrontend = project.github_link_frontend;
                                     const hasDockerBackend = project.docker_image_link_backend;

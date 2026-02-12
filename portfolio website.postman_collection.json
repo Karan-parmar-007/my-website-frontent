@@ -1,0 +1,2018 @@
+{
+  "info": {
+    "_postman_id": "d5ceb664-05cd-499b-acdc-68307e6d2326",
+    "name": "portfolio website",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "52107409",
+    "_collection_link": "https://go.postman.co/collection/52107409-d5ceb664-05cd-499b-acdc-68307e6d2326?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "password change",
+          "item": [
+            {
+              "name": "forget password",
+              "item": [
+                {
+                  "name": "forget password initiate",
+                  "request": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"email\": \"karan.ai.engineer@gmail.com\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/auth/forgot-password",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "auth",
+                        "forgot-password"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "forget password complete",
+                  "request": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"otp\": \"948252\",\r\n  \"newPassword\": \"A@2345678\",\r\n  \"logoutAllDevices\": true\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/auth/forgot-password/complete",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "auth",
+                        "forgot-password",
+                        "complete"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "change password",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"currentPassword\": \"A@2345678\",\r\n  \"newPassword\": \"A@2345678\",\r\n  \"confirmPassword\": \"A@2345678\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/auth/change-password",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "change-password"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Sign up",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"user1@example.com\",\r\n  \"password\": \"A@2345678\",\r\n  \"preferredName\": \"user\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base url}}/api/v1/auth/signup",
+              "host": [
+                "{{base url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "signup"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"email\": \"user1@example.com\",\r\n  \"password\": \"A@2345678\",\r\n  \"preferredName\": \"user\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/auth/signup",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "signup"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "date",
+                  "value": "Wed, 04 Feb 2026 16:32:04 GMT"
+                },
+                {
+                  "key": "server",
+                  "value": "uvicorn"
+                },
+                {
+                  "key": "content-length",
+                  "value": "202"
+                },
+                {
+                  "key": "content-type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "set-cookie",
+                  "value": "access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTY2NWE2Mi05OTA0LTRhZmUtYjk2NS1jN2YwNWY4ODYyOWIiLCJ0eXBlIjoiYWNjZXNzIiwidXNlcl9pZCI6ImFlNjY1YTYyLTk5MDQtNGFmZS1iOTY1LWM3ZjA1Zjg4NjI5YiIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJleHAiOjE3NzAyMjM2MjV9.Cp_cH9nt3buvJQZ1TODvOTev4bHPQhKTWKFoO-yhdRg; HttpOnly; Max-Age=900; Path=/; SameSite=strict; Secure"
+                },
+                {
+                  "key": "set-cookie",
+                  "value": "refresh_token=211c2c8621b5bfb986c2ee271b3aa223122c2ba2c951ac3c81d1c1036cf2fa2e5a76f2e0430cd595212046d3819288c7a651dc1bb3e2ec63d60fba6a4fe8e135; HttpOnly; Max-Age=2592000; Path=/api/v1/auth; SameSite=strict; Secure"
+                },
+                {
+                  "key": "set-cookie",
+                  "value": "csrf_token=6a2c6866023807a02c916600955b5f286f266fb3c485a762fbf5ea20e8ba82ce; Max-Age=604800; Path=/; SameSite=strict; Secure"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"user\": {\n        \"id\": \"ae665a62-9904-4afe-b965-c7f05f88629b\",\n        \"email\": \"user1@example.com\",\n        \"preferredName\": \"user\",\n        \"emailVerified\": false,\n        \"roleName\": \"user\"\n    },\n    \"accessTokenExpiresIn\": 900,\n    \"message\": \"Signup successful\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-csrf-token",
+                "value": "{{X-CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base url}}/api/v1/auth/logout",
+              "host": [
+                "{{base url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"karan.ai.engineer@gmail.com\",\r\n  \"password\": \"A@2345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base url}}/api/v1/auth/login",
+              "host": [
+                "{{base url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "refresh access token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base url}}/api/v1/auth/refresh",
+              "host": [
+                "{{base url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "get all sessions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base url}}/api/v1/auth/sessions",
+              "host": [
+                "{{base url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "sessions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete one session",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-csrf-token",
+                "value": "{{X-CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base url}}/api/v1/auth/sessions/a95e2ad8-f11b-44e6-ad95-c4684ef47598",
+              "host": [
+                "{{base url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "sessions",
+                "a95e2ad8-f11b-44e6-ad95-c4684ef47598"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "revoke all sessions",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "x-csrf-token",
+                "value": "{{X-CSRF_TOKEN}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base url}}/api/v1/auth/sessions",
+              "host": [
+                "{{base url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "sessions"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "portfolio",
+      "item": [
+        {
+          "name": "profile",
+          "item": [
+            {
+              "name": "get profile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/profile-info",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "profile-info"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "get profile",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/profile-info",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "profile-info"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 07:22:49 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "259"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"id\": \"723f2483-d929-4cee-879a-87013406c116\",\n    \"name\": \"karan Parmar\",\n    \"about\": \"this is about section\",\n    \"headline\": \"this is headlines\",\n    \"email\": \"karan.ai.engineer@gmail.com\",\n    \"phone\": \"1234567891\",\n    \"location\": \"mumbai, india\",\n    \"has_profile_image\": true,\n    \"has_resume\": true\n}"
+                }
+              ]
+            },
+            {
+              "name": "create portfolio",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"string\",\r\n  \"about\": \"string\",\r\n  \"headline\": \"string\",\r\n  \"email\": \"user@example.com\",\r\n  \"phone\": \"string\",\r\n  \"location\": \"string\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/profile-info",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "profile-info"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "create portfolio",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"name\": \"string\",\r\n  \"about\": \"string\",\r\n  \"headline\": \"string\",\r\n  \"email\": \"user@example.com\",\r\n  \"phone\": \"string\",\r\n  \"location\": \"string\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/profile-info",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "profile-info"
+                      ]
+                    }
+                  },
+                  "status": "Bad Request",
+                  "code": 400,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 07:23:14 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "35"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"detail\": \"Profile already exists\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "update portfolio",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"Karan\",\r\n  \"about\": \"about\",\r\n  \"headline\": \"headline\",\r\n  \"email\": \"karan.ai.engineer@gmail.com\",\r\n  \"phone\": \"+918793759908\",\r\n  \"location\": \"mumbai, maharashtra, India\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/profile-info",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "profile-info"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "update portfolio",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"name\": \"Karan\",\r\n  \"about\": \"about\",\r\n  \"headline\": \"headline\",\r\n  \"email\": \"karan.ai.engineer@gmail.com\",\r\n  \"phone\": \"+918793759908\",\r\n  \"location\": \"mumbai, maharashtra, India\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/profile-info",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "profile-info"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 07:24:35 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "243"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"id\": \"723f2483-d929-4cee-879a-87013406c116\",\n    \"name\": \"Karan\",\n    \"about\": \"about\",\n    \"headline\": \"headline\",\n    \"email\": \"karan.ai.engineer@gmail.com\",\n    \"phone\": \"+918793759908\",\n    \"location\": \"mumbai, maharashtra, India\",\n    \"has_profile_image\": true,\n    \"has_resume\": true\n}"
+                }
+              ]
+            },
+            {
+              "name": "delete portfolio",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/profile-info",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "profile-info"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "delete portfolio",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/profile-info",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "profile-info"
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 06:54:39 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "30"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"detail\": \"Profile not found\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "get profile image",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/profile-info/image",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "profile-info",
+                    "image"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update profile image",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "profile_image",
+                      "type": "file",
+                      "uuid": "8d30f54b-9e00-4865-8817-bff6a9d8a21d",
+                      "src": "/C:/Users/ADMIN/Pictures/important_images/my.jpg"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/profile-info/image",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "profile-info",
+                    "image"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "update profile image",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "profile_image",
+                          "type": "file",
+                          "uuid": "8d30f54b-9e00-4865-8817-bff6a9d8a21d",
+                          "src": "/C:/Users/ADMIN/Pictures/important_images/my.jpg"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/profile-info/image",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "profile-info",
+                        "image"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 07:28:02 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "48"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"message\": \"Profile image updated successfully\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "delete profile image",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/profile-info/image",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "profile-info",
+                    "image"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "delete profile image",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/profile-info/image",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "profile-info",
+                        "image"
+                      ]
+                    }
+                  },
+                  "status": "No Content",
+                  "code": 204,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 07:27:46 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            },
+            {
+              "name": "get resume",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/profile-info/resume",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "profile-info",
+                    "resume"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update profile resume",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "resume_file",
+                      "type": "file",
+                      "uuid": "87b76dad-384b-47dc-9b8b-204da5fdf101",
+                      "src": "/C:/Users/ADMIN/Documents/my_resume/Karan_parmar_resume.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/profile-info/resume",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "profile-info",
+                    "resume"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "update profile resume",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "resume_file",
+                          "type": "file",
+                          "uuid": "87b76dad-384b-47dc-9b8b-204da5fdf101",
+                          "src": "/C:/Users/ADMIN/Documents/my_resume/Karan_parmar_resume.pdf"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/profile-info/resume",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "profile-info",
+                        "resume"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 07:34:26 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "41"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"message\": \"Resume updated successfully\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "delete resume",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/profile-info/resume",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "profile-info",
+                    "resume"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "delete resume",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/profile-info/resume",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "profile-info",
+                        "resume"
+                      ]
+                    }
+                  },
+                  "status": "No Content",
+                  "code": 204,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 07:32:41 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "education",
+          "item": [
+            {
+              "name": "get education",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/education",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "education"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "get education",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/education",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "education"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 07:03:36 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "565"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "[\n    {\n        \"sequence\": 3,\n        \"school\": \"St. Aloysiou\",\n        \"degree\": \"secondary school\",\n        \"start_year\": 2016,\n        \"end_year\": 2017,\n        \"Score\": 68,\n        \"description\": \"10th pass 😂\",\n        \"id\": \"88fe768c-c3cb-46e8-b71b-a39f5163f8e0\"\n    },\n    {\n        \"sequence\": 2,\n        \"school\": \"R.P Jr College\",\n        \"degree\": \"High school\",\n        \"start_year\": 2020,\n        \"end_year\": 2021,\n        \"Score\": 68,\n        \"description\": \"12th pass 😂\",\n        \"id\": \"3b53737b-a2b2-43b5-b884-7b343908c811\"\n    },\n    {\n        \"sequence\": 1,\n        \"school\": \"St. Aloysiou\",\n        \"degree\": \"secondary school\",\n        \"start_year\": 2016,\n        \"end_year\": null,\n        \"Score\": null,\n        \"description\": \"10th pass 😂\",\n        \"id\": \"34dfb1f3-26c9-4ea7-922d-4e235663e683\"\n    }\n]"
+                }
+              ]
+            },
+            {
+              "name": "update education",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"id\": \"3b53737b-a2b2-43b5-b884-7b343908c811\",\r\n  \"sequence\": 2,\r\n  \"school\": \"R.P Jr College\",\r\n  \"degree\": \"High school\",\r\n  \"start_year\": 2020,\r\n  \"end_year\": 2020,\r\n  \"Score\": 84,\r\n  \"description\": \"string\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/education",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "education"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "success",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"id\": \"3b53737b-a2b2-43b5-b884-7b343908c811\",\r\n  \"sequence\": 2,\r\n  \"school\": \"R.P Jr College\",\r\n  \"degree\": \"High school\",\r\n  \"start_year\": 2020,\r\n  \"end_year\": 2020,\r\n  \"Score\": 84,\r\n  \"description\": \"string\"\r\n}\r\n",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/education",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "education"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 07:41:46 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "51"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"message\": \"Education record updated successfully\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "delete education",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/education/{3b53737b-a2b2-43b5-b884-7b343908c811}",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "education",
+                    "{3b53737b-a2b2-43b5-b884-7b343908c811}"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "delete education",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/education/{3b53737b-a2b2-43b5-b884-7b343908c811}",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "education",
+                        "{3b53737b-a2b2-43b5-b884-7b343908c811}"
+                      ]
+                    }
+                  },
+                  "status": "No Content",
+                  "code": 204,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 07:42:57 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            },
+            {
+              "name": "add education",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"sequence\": 2,\r\n  \"school\": \"R.P Jr College\",\r\n  \"degree\": \"High school\",\r\n  \"start_year\": 2020,\r\n  \"end_year\": 2020,\r\n  \"Score\": 84,\r\n  \"description\": \"string\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/education",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "education"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "add education",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"sequence\": 2,\r\n  \"school\": \"R.P Jr College\",\r\n  \"degree\": \"High school\",\r\n  \"start_year\": 2020,\r\n  \"end_year\": 2020,\r\n  \"Score\": 84,\r\n  \"description\": \"string\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/education",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "education"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 07:44:34 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "105"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"message\": \"Education record created successfully\",\n    \"education_id\": \"90ce710d-4896-49d9-806f-beac2221cc12\"\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "work experience",
+          "item": [
+            {
+              "name": "get work experience",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/work-experience",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "work-experience"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "get work experience",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/work-experience",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "work-experience"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 09:07:48 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "2710"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "[\n    {\n        \"company\": \"hire intel\",\n        \"sequence\": 3,\n        \"position\": \"Graphic designer\",\n        \"start_date\": \"2022-03-20\",\n        \"end_date\": \"2022-10-20\",\n        \"description\": [\n            \"Designed and executed visually stunning print and digital media graphics, including logos, website banners, and promotional materials, resulting in a 40% increase in customer engagement and a 25% boost in brand recognition.\",\n            \"Developed and maintained visually appealing company websites, produced and edited YouTube videos, and managed ad campaigns to drive brand awareness\",\n            \"Engaged with clients to understand their needs, leading to successful lead conversions and long-term partnerships.\"\n        ],\n        \"id\": \"2a4abc66-aaa0-4d8d-a60b-a5a737d2ef15\"\n    },\n    {\n        \"company\": \"chein\",\n        \"sequence\": 4,\n        \"position\": \"Graphic designer\",\n        \"start_date\": \"2022-03-20\",\n        \"end_date\": \"2022-10-20\",\n        \"description\": [\n            \"Designed and executed visually stunning print and digital media graphics, including logos, website banners, and promotional materials, resulting in a 40% increase in customer engagement and a 25% boost in brand recognition.\",\n            \"Developed and maintained visually appealing company websites, produced and edited YouTube videos, and managed ad campaigns to drive brand awareness\",\n            \"Engaged with clients to understand their needs, leading to successful lead conversions and long-term partnerships.\"\n        ],\n        \"id\": \"556c6a38-1ce7-4af3-96f3-2a2f34294628\"\n    },\n    {\n        \"company\": \"branding catalysts\",\n        \"sequence\": 2,\n        \"position\": \"Graphic designer\",\n        \"start_date\": \"2022-03-20\",\n        \"end_date\": \"2022-10-20\",\n        \"description\": [\n            \"Designed and executed visually stunning print and digital media graphics, including logos, website banners, and promotional materials, resulting in a 40% increase in customer engagement and a 25% boost in brand recognition.\",\n            \"Developed and maintained visually appealing company websites, produced and edited YouTube videos, and managed ad campaigns to drive brand awareness\",\n            \"Engaged with clients to understand their needs, leading to successful lead conversions and long-term partnerships.\"\n        ],\n        \"id\": \"e87f9d28-5881-4b6d-969d-7dd0287e3b1c\"\n    },\n    {\n        \"company\": \"trading seva 2020\",\n        \"sequence\": 1,\n        \"position\": \"Graphic designer\",\n        \"start_date\": \"2022-03-20\",\n        \"end_date\": null,\n        \"description\": [\n            \"Designed and executed visually stunning print and digital media graphics, including logos, website banners, and promotional materials, resulting in a 40% increase in customer engagement and a 25% boost in brand recognition.\",\n            \"Developed and maintained visually appealing company websites, produced and edited YouTube videos, and managed ad campaigns to drive brand awareness\",\n            \"Engaged with clients to understand their needs, leading to successful lead conversions and long-term partnerships.\",\n            \"added extra to check\"\n        ],\n        \"id\": \"f9fd4f70-a38e-48fe-baa5-db4b72ac31e0\"\n    }\n]"
+                }
+              ]
+            },
+            {
+              "name": "create work experience",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"company\": \"string\",\r\n  \"sequence\": 0,\r\n  \"position\": \"string\",\r\n  \"start_date\": \"2026-02-05\",\r\n  \"end_date\": \"2026-02-05\",\r\n  \"description\": [\r\n    \"string\"\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/work-experience",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "work-experience"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "create work experience",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"company\": \"string\",\r\n  \"sequence\": 0,\r\n  \"position\": \"string\",\r\n  \"start_date\": \"2026-02-05\",\r\n  \"end_date\": \"2026-02-05\",\r\n  \"description\": [\r\n    \"string\"\r\n  ]\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/work-experience",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "work-experience"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 09:09:37 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "117"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"message\": \"Work experience record created successfully\",\n    \"work_experience_id\": \"cc3b49b4-b7b2-4fb9-955c-3148f4cf021f\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "edit work experience",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"id\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\r\n  \"sequence\": 0,\r\n  \"company\": \"string\",\r\n  \"position\": \"string\",\r\n  \"start_date\": \"2026-02-05\",\r\n  \"end_date\": \"2026-02-05\",\r\n  \"description\": [\r\n    \"string\"\r\n  ]\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/work-experience",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "work-experience"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "edit work experience",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"id\": \"cc3b49b4-b7b2-4fb9-955c-3148f4cf021f\",\r\n  \"sequence\": 0,\r\n  \"company\": \"test\",\r\n  \"position\": \"idk\",\r\n  \"description\": [\r\n    \"ok bithc\"\r\n  ]\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/work-experience",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "work-experience"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 09:12:17 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "57"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"message\": \"Work experience record updated successfully\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "delete work experience",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/work-experience/7764c0d7-7488-4bed-aaf2-4605eaf1f9af",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "work-experience",
+                    "7764c0d7-7488-4bed-aaf2-4605eaf1f9af"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "delete work experience",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/work-experience/7764c0d7-7488-4bed-aaf2-4605eaf1f9af",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "work-experience",
+                        "7764c0d7-7488-4bed-aaf2-4605eaf1f9af"
+                      ]
+                    }
+                  },
+                  "status": "No Content",
+                  "code": 204,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 09:14:26 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "social media",
+          "item": [
+            {
+              "name": "get all social media",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/social-media",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "social-media"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "get all social media",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/social-media",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "social-media"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 09:33:32 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "126"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "[\n    {\n        \"id\": \"4058129b-8a5b-4507-bb84-8d41ad4c2869\",\n        \"name\": \"linkedin\",\n        \"link\": \"https://www.linkedin.com/in/karan-parmar-715ab7225/\"\n    }\n]"
+                }
+              ]
+            },
+            {
+              "name": "add social media",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"githuib\",\r\n  \"link\": \"https://github.com/Karan-parmar-007\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/social-media",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "social-media"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "add social media",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"name\": \"githuib\",\r\n  \"link\": \"https://github.com/Karan-parmar-007\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/social-media",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "social-media"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 09:35:58 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "107"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"id\": \"d8ef9093-384a-482c-b0f8-6aed1d9411e9\",\n    \"name\": \"githuib\",\n    \"link\": \"https://github.com/Karan-parmar-007\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "edit social_media",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"name\": \"github\",\r\n  \"link\": \"https://github.com/Karan-parmar-007\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/social-media/d8ef9093-384a-482c-b0f8-6aed1d9411e9",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "social-media",
+                    "d8ef9093-384a-482c-b0f8-6aed1d9411e9"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "edit social_media",
+                  "originalRequest": {
+                    "method": "PUT",
+                    "header": [
+                      {
+                        "key": "x-csrf-token",
+                        "value": "{{X-CSRF_TOKEN}}",
+                        "type": "text"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\r\n  \"name\": \"github\"\r\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{base url}}/api/v1/portfolio/social-media/d8ef9093-384a-482c-b0f8-6aed1d9411e9",
+                      "host": [
+                        "{{base url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "v1",
+                        "portfolio",
+                        "social-media",
+                        "d8ef9093-384a-482c-b0f8-6aed1d9411e9"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": null,
+                  "header": [
+                    {
+                      "key": "date",
+                      "value": "Thu, 05 Feb 2026 09:37:43 GMT"
+                    },
+                    {
+                      "key": "server",
+                      "value": "uvicorn"
+                    },
+                    {
+                      "key": "content-length",
+                      "value": "106"
+                    },
+                    {
+                      "key": "content-type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n    \"id\": \"d8ef9093-384a-482c-b0f8-6aed1d9411e9\",\n    \"name\": \"github\",\n    \"link\": \"https://github.com/Karan-parmar-007\"\n}"
+                }
+              ]
+            },
+            {
+              "name": "delete social media",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "x-csrf-token",
+                    "value": "{{X-CSRF_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base url}}/api/v1/portfolio/social-media/63187949-335f-47a5-bc37-085fdd1451a6",
+                  "host": [
+                    "{{base url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "portfolio",
+                    "social-media",
+                    "63187949-335f-47a5-bc37-085fdd1451a6"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

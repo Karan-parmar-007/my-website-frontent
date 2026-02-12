@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, checkAuth } = useAuth();
+  const { login, setUserAfterNav } = useAuth();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,8 +43,14 @@ const Login = () => {
     try {
       const result = await login({ email: email.toLowerCase(), password });
       if (result.success) {
+        // Navigate FIRST, then set user state to avoid PublicOnlyRoute redirect
         navigate('/', { replace: true });
-        checkAuth(); // Update user state after navigation
+        // Use setTimeout to ensure navigation completes before state update
+        setTimeout(() => {
+          if (result.user) {
+            setUserAfterNav(result.user);
+          }
+        }, 0);
       } else {
         setError(result.message || 'Invalid email or password');
       }

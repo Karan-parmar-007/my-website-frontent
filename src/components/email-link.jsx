@@ -1,7 +1,7 @@
-import { useProfileData } from '@/hooks/usePortfolioData';
+import { useProfileInfo } from '@/lib/queries/usePortfolioQueries';
 
 const EmailLink = () => {
-  const { profileData } = useProfileData();
+  const { data: profileData } = useProfileInfo();
   const email = profileData?.email || 'karan.ai.engineer@gmail.com';
 
   return (

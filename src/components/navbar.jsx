@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useProfileData } from '@/hooks/usePortfolioData';
+import { useProfileInfo } from '@/lib/queries/usePortfolioQueries';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { profileData } = useProfileData();
+  const { data: profileData } = useProfileInfo();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
@@ -23,9 +23,12 @@ const Navbar = () => {
         { number: '03', text: 'Work', href: '#work' },
         { number: '04', text: 'Contact', href: '#contact' },
         { number: '05', text: 'Projects', href: '/projects' },
+        { number: '06', text: 'Skills', href: '/skills' },
       ]
     : [
         { text: 'Home', href: '/' },
+        { text: 'Projects', href: '/projects' },
+        { text: 'Skills', href: '/skills' },
       ];
 
   // Helper function to determine if a link is active
@@ -273,6 +276,7 @@ const Navbar = () => {
                       isActive(item.href) ? 'text-[#64ffda]' : 'text-[#ccd6f6] hover:text-[#64ffda]'
                     }`}
                   >
+                    {item.number && <span className="text-[#64ffda] mr-2 text-sm">{item.number}.</span>}
                     <span className="text-base">{item.text}</span>
                   </button>
                 )}
